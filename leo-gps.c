@@ -1002,11 +1002,14 @@ static void* gps_timer_thread( void*  arg ) {
             update_gps_svstatus( &r->sv_status );
             r->sv_status_changed = 0;
         }
-
+        int elapsed = 0;
+        clock_t now = clock();
         GPS_STATE_UNLOCK_FIX(state);
-
-        uint64_t microseconds = (state->fix_freq * 1000000) - 500000;
-        usleep(microseconds);
+        do{
+        elapsed = (clock()-now)/CLOCKS_PER_SEC;
+        }while(elapsed<=fix_freq);
+        //uint64_t microseconds = (state->fix_freq * 1000000) - 500000;
+        //usleep(microseconds);
         //D("%s() usleep(%ld)", __FUNCTION__, microseconds);
 
     } while(state->init == STATE_START);

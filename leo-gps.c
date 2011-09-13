@@ -1006,10 +1006,10 @@ static void* gps_timer_thread( void*  arg ) {
         clock_t now = clock();
         GPS_STATE_UNLOCK_FIX(state);
         do{
-        elapsed = (clock()-now)/CLOCKS_PER_SEC;
+            usleep((uint64_t)500000);
+            elapsed = (clock()-now)/CLOCKS_PER_SEC;
         }while(elapsed<state->fix_freq);
-        //uint64_t microseconds = (state->fix_freq * 1000000) - 500000;
-        //usleep(microseconds);
+        
         //D("%s() usleep(%ld)", __FUNCTION__, microseconds);
 
     } while(state->init == STATE_START);

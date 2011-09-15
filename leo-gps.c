@@ -1004,8 +1004,7 @@ static void* gps_timer_thread( void*  arg ) {
             r->sv_status_changed = 0;
         }
         GPS_STATE_UNLOCK_FIX(state);
-        D(" r->fix.flags & GPS_LOCATION_HAS_LAT_LONG = %d & %d",r->fix.flags, GPS_LOCATION_HAS_LAT_LONG);
-        if (!GPS_LOCATION_HAS_LAT_LONG) {        
+        if (r->fix_flags_cached) {        
             int elapsed = 0;
             clock_t now = clock();
             do{

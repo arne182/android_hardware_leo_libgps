@@ -996,25 +996,30 @@ static void* gps_timer_thread( void*  arg ) {
             D("r->fix.flags = 0x%x", r->fix.flags);
 #endif
             r->fix.flags = 0;
-            int elapsed = 0;
-            clock_t now = clock();
-            do{
-                usleep((uint64_t)500000);
-                elapsed = (clock()-now)/CLOCKS_PER_SEC;
-            }while(elapsed<state->fix_freq);
         }
-        else
-            usleep((uint64_t)500000);
+
 
         if (r->sv_status_changed) {
             update_gps_svstatus( &r->sv_status );
             r->sv_status_changed = 0;
         }
-
+        D(" r->fix.flags & GPS_LOCATION_HAS_LAT_LONG = %d",r->fix.flags & GPS_LOCATION_HAS_LAT_LONG);
+        if (r->fix.flags & GPS_LOCATION_HAS_LAT_LONG) {        
+            int elapsed = 0;
+            clock_t now = clock();
+            do{
+                usleep((uint64_t)500000);
+                elapsed = (clock()-now)/CLOCKS_PER_SEC;
+                D("elapsed = %d",elapsed)
+            }while(elapsed<state->fix_freq);
+        }
+        else
+            usleep((uint64_t)500000);
+            
         GPS_STATE_UNLOCK_FIX(state);
 
         
-        //D("%s() usleep(%ld)", __FUNCTION__, microseconds);
+        
 
     } while(state->init == STATE_START);
 

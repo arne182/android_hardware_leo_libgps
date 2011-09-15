@@ -1010,7 +1010,7 @@ static void* gps_timer_thread( void*  arg ) {
             do{
                 usleep((uint64_t)500000);
                 elapsed = (clock()-now)/CLOCKS_PER_SEC;
-                D("elapsed = %d",elapsed)
+                D("elapsed = %d",elapsed);
             }while(elapsed<state->fix_freq);
         }
         else

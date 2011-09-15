@@ -40,7 +40,7 @@
 #define  XTRA_BLOCK_SIZE  400
 #define  ENABLE_NMEA 1
 
-#define  DUMP_DATA  1
+#define  DUMP_DATA  0
 #define  GPS_DEBUG  1
 
 #if GPS_DEBUG
@@ -1005,7 +1005,7 @@ static void* gps_timer_thread( void*  arg ) {
         }
         GPS_STATE_UNLOCK_FIX(state);
         D(" r->fix.flags & GPS_LOCATION_HAS_LAT_LONG = %d & %d",r->fix.flags, GPS_LOCATION_HAS_LAT_LONG);
-        if (GPS_LOCATION_HAS_LAT_LONG) {        
+        if (!GPS_LOCATION_HAS_LAT_LONG) {        
             int elapsed = 0;
             clock_t now = clock();
             do{

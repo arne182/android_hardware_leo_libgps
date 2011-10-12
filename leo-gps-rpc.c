@@ -915,7 +915,7 @@ int parse_gps_conf() {
             if (result != NULL) {
                 result = result+strlen(check_precision)+1;
                 i = atoi(result);
-                if (i>0 && i<16)
+                if (i>0 && i<50)
                     MEASUREMENT_PRECISION = i;
                 CHECKED[4] = 1;
             }

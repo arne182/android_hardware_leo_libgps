@@ -982,8 +982,8 @@ static void* gps_timer_thread( void*  arg ) {
     usleep((uint64_t)500000);
     memset( r->sv_status.sv_list, 0, sizeof(r->sv_status.sv_list) );
     int fix_temp = state->fix_freq;
-    state->fix_freq = 1;
     do {
+        state->fix_freq = 1;
         GPS_STATE_LOCK_FIX(state);
 
 #if DUMP_DATA
@@ -1017,8 +1017,7 @@ static void* gps_timer_thread( void*  arg ) {
         }
         else
             usleep((uint64_t)500000);
-    
-
+    fix_temp = state->fix_freq
     } while(state->init == STATE_START);
 
     D("%s() destroyed", __FUNCTION__);

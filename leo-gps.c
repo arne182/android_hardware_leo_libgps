@@ -979,6 +979,9 @@ static void* gps_timer_thread( void*  arg ) {
     r->fix_flags_cached = 0;
     r->sv_status_changed = 0;
     r->sv_status.num_svs = 0;
+    int fix_temp = state->fix_freq;
+    s->fix_freq = 1;
+    usleep((uint64_t)500000);
     memset( r->sv_status.sv_list, 0, sizeof(r->sv_status.sv_list) );
 
     do {
@@ -1004,6 +1007,7 @@ static void* gps_timer_thread( void*  arg ) {
             r->sv_status_changed = 0;
         }
         GPS_STATE_UNLOCK_FIX(state);
+        state->fix_freq = fix_temp;
         if (r->fix_flags_cached) {        
             int elapsed = 0;
             clock_t now = clock();
@@ -1014,6 +1018,7 @@ static void* gps_timer_thread( void*  arg ) {
         }
         else
             usleep((uint64_t)500000);
+    
 
     } while(state->init == STATE_START);
 

@@ -2512,7 +2512,7 @@ void gps_get_position()
 
 void exit_gps_rpc() 
 {
-    pdsm_client_end_session(_clnt, 0, 0, 0, 2);
+    pdsm_client_end_session(0, 0, 0, 0x1);
 }
 
 void cleanup_gps_rpc_clients() 

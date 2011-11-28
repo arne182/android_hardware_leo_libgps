@@ -1413,34 +1413,6 @@ int pdsm_atl_dns_proxy_reg(struct CLIENT *clnt, int val0, int val1) {
 
 
 
-int pdsm_xtra_set_data(struct CLIENT *clnt, int val0, int client_ID, int val2, unsigned char *xtra_data_ptr, uint32_t part_len, uint8_t part, uint8_t total_parts, int val3) {
-    struct xtra_data_params xtra_data;
-    uint32_t res = -1;
-    uint32_t par_data[4];
-    xtra_data.data = par_data;
-    xtra_data.data[0]=val0;
-    xtra_data.data[1]=client_ID;
-    xtra_data.data[2]=val2;
-    xtra_data.xtra_data_ptr = xtra_data_ptr;
-    xtra_data.part_len      = part_len;
-    xtra_data.part          = part;
-    xtra_data.total_parts   = total_parts;
-    xtra_data.data[3]=val3;
-    enum clnt_stat cs = -1;
-    cs = clnt_call(clnt, 0x1A,
-            (xdrproc_t) xdr_xtra_data_args,
-            (caddr_t) &xtra_data,
-            (xdrproc_t) xdr_result_int,
-            (caddr_t) &res, timeout);
-    //D("%s() is called: clnt_stat=%d", __FUNCTION__, cs);
-    if (cs != RPC_SUCCESS){
-        D("pdsm_xtra_set_data(%x, %x, %d, 0x%x, %d, %d, %d, %d) failed\n", val0, client_ID, val2, (int) xtra_data_ptr, part_len, part, total_parts, val3);
-        exit(-1);
-    }
-    D("pdsm_xtra_set_data(%x, %x, %d, 0x%x, %d, %d, %d, %d)=%d\n", val0, client_ID, val2, (int) xtra_data_ptr, part_len, part, total_parts, val3, res);
-    return res;
-}
-
 int pdsm_xtra_inject_time_info(uint32_t val0, int client, uint32_t val2, pdsm_xtra_time_info_type *pdsm_xtra_time_info_type) 
 {
 	uint32_t res = -1;

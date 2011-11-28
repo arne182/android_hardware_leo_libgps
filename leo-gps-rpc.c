@@ -171,12 +171,6 @@ struct params {
     int length;
 };
 
-typedef struct xtra_conf_auto_params_struct
-{
-    int auto_enable;
-	uint16_t interval;
-} xtra_conf_auto_params;
-
 typedef struct pdsm_client_init_args_struct
 {
     pdsm_client_type_e pdsm_client_type_e;

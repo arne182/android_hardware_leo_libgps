@@ -1981,7 +1981,7 @@ int init_gps_rpc()
 int gps_xtra_set_data(unsigned char *xtra_data_ptr, uint32_t xtra_data_len, uint8_t part_number, uint8_t total_parts) 
 {
     uint32_t res = -1;
-    res = res = pdsm_xtra_set_data(0, 0xB, 0, xtra_data_ptr, xtra_data_len, part_number, total_parts, 1);
+    res = pdsm_xtra_set_data(0, 0xB, 0, xtra_data_ptr, xtra_data_len, part_number, total_parts, 1);
     return res;
 }
 

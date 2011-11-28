@@ -1503,27 +1503,6 @@ int pdsm_client_lcs_reg(struct CLIENT *clnt, int client, int val0, int val1, int
     return res;
 }
 
-int pdsm_client_ext_status_reg(struct CLIENT *clnt, int client, int val0, int val1, int val2, int val3, int val4) {
-    struct params par;
-    uint32_t res;
-    uint32_t par_data[6];
-    par.data = par_data;
-    par.length=6;
-    par.data[0]=client_IDs[client];
-    par.data[1]=val0;
-    par.data[2]=val1;
-    par.data[3]=val2;
-    par.data[4]=val3;
-    par.data[5]=val4;
-    if(clnt_call(clnt, 0x8, xdr_args, &par, xdr_result_int, &res, timeout)) {
-        D("pdsm_client_ext_status_reg(%x, %d, %d, %d, %d, %d) failed\n", par.data[0], par.data[1], par.data[2], par.data[3], par.data[4], par.data[5]);
-        exit(-1);
-    }
-    D("pdsm_client_ext_status_reg(%x, %d, %d, %d, %d, %d)=%d\n", par.data[0], par.data[1], par.data[2], par.data[3], par.data[4], par.data[5], res);
-    return res;
-}
-
-
 
 int pdsm_xtra_set_data(struct CLIENT *clnt, int val0, int client_ID, int val2, unsigned char *xtra_data_ptr, uint32_t part_len, uint8_t part, uint8_t total_parts, int val3) {
     struct xtra_data_params xtra_data;

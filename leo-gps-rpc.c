@@ -467,7 +467,7 @@ typedef struct pdsm_get_parameters_args_struct
 /*struct xtra_time_params {
     uint32_t *data;
     pdsm_xtra_time_info_type *time_info_ptr;
-};*/
+};
 
 struct xtra_data_params {
     uint32_t *data;
@@ -494,7 +494,7 @@ static bool_t xdr_args(XDR *clnt, struct params *par) {
     for(i=0;par->length>i;++i)
         SEND_VAL(par->data[i]);
     return 1;
-}
+}*/
 
 static bool_t xdr_result_int(XDR *clnt, uint32_t *result) {
     XDR_RECV_UINT32(clnt, result);
@@ -1341,7 +1341,7 @@ static bool_t xdr_rpc_pdsm_query_data_validity_args(XDR *xdrs, pdsm_xtra_query_d
         return 0;
 
     return 1;
-}*/
+}
 
 static bool_t xdr_xtra_time_args(XDR *xdrs, struct xtra_time_params *xtra_time) {
     //D("%s() is called", __FUNCTION__);
@@ -1385,7 +1385,7 @@ static bool_t xdr_xtra_auto_args(XDR *xdrs, struct xtra_auto_params *xtra_auto) 
         return 0;
 
     return 1;
-}
+}*/
 
 
 

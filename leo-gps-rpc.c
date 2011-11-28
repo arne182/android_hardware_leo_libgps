@@ -1523,25 +1523,6 @@ int pdsm_client_ext_status_reg(struct CLIENT *clnt, int client, int val0, int va
     return res;
 }
 
-int pdsm_client_xtra_reg(struct CLIENT *clnt, int client, int val0, int val1, int val2, int val3, int val4) {
-    struct params par;
-    uint32_t res;
-    uint32_t par_data[6];
-    par.data = par_data;
-    par.length=6;
-    par.data[0]=client_IDs[client];
-    par.data[1]=val0;
-    par.data[2]=val1;
-    par.data[3]=val2;
-    par.data[4]=val3;
-    par.data[5]=val4;
-    if(clnt_call(clnt, 0x7, xdr_args, &par, xdr_result_int, &res, timeout)) {
-        D("pdsm_client_xtra_reg(%x, %d, %d, %d, %d, %d) failed\n", par.data[0], par.data[1], par.data[2], par.data[3], par.data[4], par.data[5]);
-        exit(-1);
-    }
-    D("pdsm_client_xtra_reg(%x, %d, %d, %d, %d, %d)=%d\n", par.data[0], par.data[1], par.data[2], par.data[3], par.data[4], par.data[5], res);
-    return res;
-}
 
 
 int pdsm_xtra_set_data(struct CLIENT *clnt, int val0, int client_ID, int val2, unsigned char *xtra_data_ptr, uint32_t part_len, uint8_t part, uint8_t total_parts, int val3) {
@@ -1588,28 +1569,19 @@ int pdsm_xtra_inject_time_info(uint32_t val0, int client, uint32_t val2, pdsm_xt
 	return res;
 }
 
-int pdsm_xtra_query_data_validity(struct CLIENT *clnt, int val0, int client_ID, int val2) {
-    //Not Tested Not Used
-    struct xtra_validity_params xtra_validity;
-    uint32_t res = -1;
-    uint32_t par_data[3];
-    xtra_validity.data = par_data;
-    xtra_validity.data[0]=val0;
-    xtra_validity.data[1]=client_ID;
-    xtra_validity.data[2]=val2;
-    enum clnt_stat cs = -1;
-    cs = clnt_call(clnt, 0x1D,
-            (xdrproc_t) xdr_xtra_validity_args,
-            (caddr_t) &xtra_validity,
-            (xdrproc_t) xdr_result_int,
-            (caddr_t) &res, timeout);
-    //D("%s() is called: clnt_stat=%d", __FUNCTION__, cs);
-    if (cs != RPC_SUCCESS){
-        D("pdsm_xtra_query_data_validity(%x, %x, %d) failed\n", val0, client_ID, val2);
-        exit(-1);
-    }
-    D("pdsm_xtra_query_data_validity(%x, %x, %d)=%d\n", val0, client_ID, val2, res);
-    return res;
+int pdsm_xtra_query_data_validity(uint32_t val0, int client, uint32_t val2) 
+{
+	uint32_t res = -1;
+	pdsm_xtra_query_data_validity_args pdsm_xtra_query_data_validity_args;
+	pdsm_xtra_query_data_validity_args.pdsm_xtra_cmd_cb_f_type = val0;
+	pdsm_xtra_query_data_validity_args.pdsm_client_id_type = client_IDs[client];
+	pdsm_xtra_query_data_validity_args.pdsm_xtra_query_data_validity_args_client_data_ptr = val2;
+	if(clnt_call(_clnt, 0x1D, xdr_rpc_pdsm_query_data_validity_args, &pdsm_xtra_query_data_validity_args, xdr_result_int, &res, timeout)) {
+		D("pdsm_xtra_query_data_validity(%x, %x, %d) failed\n", val0, client, val2);
+		exit(-1);
+	}
+	D("pdsm_xtra_query_data_validity(%x, %x, %d)=%d\n", val0, client, val2, res);
+	return res;
 }
 
 int pdsm_get_parameters(uint32_t val0, uint32_t val1, uint32_t val2, int client) 

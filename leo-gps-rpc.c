@@ -1573,21 +1573,6 @@ int pdsm_client_deact(struct CLIENT *clnt, int client) {
     return res;
 }
 
-int pdsm_client_act(struct CLIENT *clnt, int client) {
-    struct params par;
-    uint32_t res;
-    uint32_t par_data[1];
-    par.data = par_data;
-    par.length=1;
-    par.data[0]=client_IDs[client];
-    if(clnt_call(clnt, 0x9, xdr_args, &par, xdr_result_int, &res, timeout)) {
-        D("pdsm_client_act(%x) failed\n", par.data[0]);
-        exit(-1);
-    }
-    D("pdsm_client_act(%x)=%d\n", par.data[0], res);
-    return res;
-}
-
 int pdsm_xtra_set_data(struct CLIENT *clnt, int val0, int client_ID, int val2, unsigned char *xtra_data_ptr, uint32_t part_len, uint8_t part, uint8_t total_parts, int val3) {
     struct xtra_data_params xtra_data;
     uint32_t res = -1;
@@ -2153,45 +2138,47 @@ int parse_gps_conf() {
 
 int init_leo() 
 {
-    struct CLIENT *clnt=clnt_create(NULL, 0x3000005B, 0x00010001, NULL);
-    struct CLIENT *clnt_atl=clnt_create(NULL, 0x3000001D, 0x00010001, NULL);
-    int i;
-    _clnt=clnt;
-    SVCXPRT *svc=svcrtr_create();
-    _svc=svc;
-    xprt_register(svc);
-    svc_register(svc, 0x3100005b, 0x00010001, (__dispatch_fn_t)dispatch, 0);
-    svc_register(svc, 0x3100005b, 0, (__dispatch_fn_t)dispatch, 0);
-    svc_register(svc, 0x3100001d, 0x00010001, (__dispatch_fn_t)dispatch, 0);
-    svc_register(svc, 0x3100001d, 0, (__dispatch_fn_t)dispatch, 0);
-    if(!clnt) {
-        D("Failed creating client\n");
-        return -1;
-    }
-    if(!svc) {
-        D("Failed creating server\n");
-        return -2;
-    }
-
-    // PDA
-    pdsm_client_init(clnt, 2);
-    pdsm_client_pd_reg(clnt, 2, 0, 0, 0, 0xF3F0FFFF, 0);
-    pdsm_client_pa_reg(clnt, 2, 0, 2, 0, 0x7FFEFE0, 0);
-    pdsm_client_ext_status_reg(clnt, 2, 0, 1, 0, 4, 0);
-    pdsm_client_act(clnt, 2);
-
-    // XTRA
-    pdsm_client_init(clnt, 0xb);
-    pdsm_client_xtra_reg(clnt, 0xb, 0, 3, 0, 7, 0);
-    pdsm_client_act(clnt, 0xb);
-    pdsm_atl_l2_proxy_reg(clnt_atl, 1,0,0);
-    pdsm_atl_dns_proxy_reg(clnt_atl, 1,0);
-
-    // NI
-    pdsm_client_init(clnt, 4);
-    pdsm_client_lcs_reg(clnt, 4, 0, 7, 0, 0x3F0, 0);
-    pdsm_client_act(clnt, 4);
-    
+	struct CLIENT *clnt;
+	struct CLIENT *clnt_atl;
+	int i;
+	SVCXPRT *svc;
+	
+	svc=svcrtr_create();
+	_svc=svc;
+	xprt_register(svc);
+	svc_register(svc, 0x3100005b, 0x00010001, (__dispatch_fn_t)dispatch, 0);
+	svc_register(svc, 0x3100001d, 0x00010001, (__dispatch_fn_t)dispatch, 0);
+	
+	clnt=clnt_create(NULL, 0x3000005B, 0x00010001, NULL);
+	clnt_atl=clnt_create(NULL, 0x3000001D, 0x00010001, NULL);
+	_clnt=clnt;
+	_clnt_atl = clnt_atl;
+	
+	if(!clnt) {
+		D("Failed creating client\n");
+		return -1;
+	}
+	if(!svc) {
+		D("Failed creating server\n");
+		return -2;
+	}
+	
+	pdsm_client_init(0x1);
+	pdsm_client_init(0xB);
+	pdsm_atl_l2_proxy_reg(1,0,0);
+	
+	pdsm_client_pd_reg(0x1, 0, 0, 0, 0xF310FFFF, 0);
+	pdsm_client_pa_reg(0x1, 0, 0, 0, 0xFEFE0, 0);
+	pdsm_client_lcs_reg(0x1, 0, 0, 0, 0x3F0, 0);
+	pdsm_client_ext_status_reg(0x1, 0, 0, 0, 7, 0);
+	pdsm_client_xtra_reg(0xB, 0, 0, 0, 7, 0);
+	
+	pdsm_client_act(0x1);
+	pdsm_client_act(0xB);
+	
+	set_clients_active(1);
+	
+	gps_set_gps_lock(0);
     if (!CHECKED[0]) {
         if (use_nmea)
             LOGD("%s() is called: %s version", __FUNCTION__, "NMEA");

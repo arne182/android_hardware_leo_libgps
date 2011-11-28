@@ -1017,7 +1017,7 @@ static void* gps_timer_thread( void*  arg ) {
         }
         else
             usleep((uint64_t)500000);
-    fix_temp = state->fix_freq
+    fix_temp = state->fix_freq;
     } while(state->init == STATE_START);
 
     D("%s() destroyed", __FUNCTION__);

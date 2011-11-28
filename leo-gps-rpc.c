@@ -1395,23 +1395,6 @@ static bool_t xdr_xtra_auto_args(XDR *xdrs, struct xtra_auto_params *xtra_auto) 
 
 
 
-int pdsm_atl_dns_proxy_reg(struct CLIENT *clnt, int val0, int val1) {
-    struct params par;
-    uint32_t res;
-    uint32_t par_data[2];
-    par.data = par_data;
-    par.length=2;
-    par.data[0]=val0;
-    par.data[1]=val1;
-    if(clnt_call(clnt, 0x6, xdr_args, &par, xdr_result_int, &res, timeout)) {
-        D("pdsm_atl_dns_proxy_reg(%d, %d) failed\n", par.data[0], par.data[1]);
-        exit(-1);
-    }
-    D("pdsm_atl_dns_proxy(%d, %d)=%d\n", par.data[0], par.data[1], res);
-    return res;
-}
-
-
 
 int pdsm_xtra_inject_time_info(uint32_t val0, int client, uint32_t val2, pdsm_xtra_time_info_type *pdsm_xtra_time_info_type) 
 {

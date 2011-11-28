@@ -1409,21 +1409,6 @@ static int pdsm_client_init(struct CLIENT *clnt, int client) {
     return 0;
 }
 
-static int pdsm_client_release(struct CLIENT *clnt, int client) {
-    struct params par;
-    uint32_t res;
-    uint32_t par_data;
-    par.data = &par_data;
-    par.length=1;
-    par.data[0]=client_IDs[client];
-    if(clnt_call(clnt, 0x3, xdr_args, &par, xdr_result_int, &res, timeout)) {
-        D("pdsm_client_release(%x) failed\n", client_IDs[client]);
-        exit(-1);
-    }
-    D("pdsm_client_release(%x)=%x\n", client_IDs[client], res);
-    client_IDs[client]=res;
-    return 0;
-}
 
 int pdsm_atl_l2_proxy_reg(struct CLIENT *clnt, int val0, int val1, int val2) {
     struct params par;
@@ -1558,20 +1543,6 @@ int pdsm_client_xtra_reg(struct CLIENT *clnt, int client, int val0, int val1, in
     return res;
 }
 
-int pdsm_client_deact(struct CLIENT *clnt, int client) {
-    struct params par;
-    uint32_t res;
-    uint32_t par_data;
-    par.data = &par_data;
-    par.length=1;
-    par.data[0]=client_IDs[client];
-    if(clnt_call(clnt, 0xA, xdr_args, &par, xdr_result_int, &res, timeout)) {
-        D("pdsm_client_deact(%x) failed\n", par.data[0]);
-        exit(-1);
-    }
-    D("pdsm_client_deact(%x)=%d\n", par.data[0], res);
-    return res;
-}
 
 int pdsm_xtra_set_data(struct CLIENT *clnt, int val0, int client_ID, int val2, unsigned char *xtra_data_ptr, uint32_t part_len, uint8_t part, uint8_t total_parts, int val3) {
     struct xtra_data_params xtra_data;
@@ -2546,13 +2517,11 @@ void exit_gps_rpc()
 
 void cleanup_gps_rpc_clients() 
 {
-    pdsm_client_deact(_clnt, 2);
-    pdsm_client_deact(_clnt, 0xb);
-    pdsm_client_deact(_clnt, 4);
+    pdsm_client_deact(0x1);
+    pdsm_client_deact(0xB);
     
-    pdsm_client_release(_clnt, 2);
-    pdsm_client_release(_clnt, 0xb);
-    pdsm_client_release(_clnt, 4);
+    pdsm_client_release(0x1);
+    pdsm_client_release(0xB);
     
     svc_unregister(_svc, 0x3100005b, 0x00010001);
     svc_unregister(_svc, 0x3100005b, 0);
@@ -2562,6 +2531,9 @@ void cleanup_gps_rpc_clients()
     svc_destroy(_svc);
     
     clnt_destroy(_clnt);
+    clnt_destroy(_clnt_atl);
+    _clnt = NULL;
+    _clnt_atl = NULL;
 }
 
 #if DISABLE_CLEANUP

@@ -2174,7 +2174,7 @@ int gps_xtra_init_down_req()
 {
     //Tell gpsOne to request xtra data
     uint32_t res = -1;
-    res = pdsm_xtra_client_initiate_download_request(_clnt, 0, client_IDs[0xb], 0);
+    res = pdsm_xtra_client_initiate_download_request(0, 0xB, 0);
     return res;
 }
 

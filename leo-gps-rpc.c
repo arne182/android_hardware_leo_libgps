@@ -1393,39 +1393,7 @@ static bool_t xdr_xtra_auto_args(XDR *xdrs, struct xtra_auto_params *xtra_auto) 
     return 1;
 }
 
-static int pdsm_client_init(struct CLIENT *clnt, int client) {
-    struct params par;
-    uint32_t res;
-    uint32_t par_data[1];
-    par.data = par_data;
-    par.length=1;
-    par.data[0]=client;
-    if(clnt_call(clnt, 0x2, xdr_args, &par, xdr_result_int, &res, timeout)) {
-        D("pdsm_client_init(%x) failed\n", client);
-        exit(-1);
-    }
-    D("pdsm_client_init(%x)=%x\n", client, res);
-    client_IDs[client]=res;
-    return 0;
-}
 
-
-int pdsm_atl_l2_proxy_reg(struct CLIENT *clnt, int val0, int val1, int val2) {
-    struct params par;
-    uint32_t res;
-    uint32_t par_data[3];
-    par.data = par_data;
-    par.length=3;
-    par.data[0]=val0;
-    par.data[1]=val1;
-    par.data[2]=val2;
-    if(clnt_call(clnt, 0x3, xdr_args, &par, xdr_result_int, &res, timeout)) {
-        D("pdsm_atl_l2_proxy_reg(%d, %d, %d) failed\n", par.data[0], par.data[1], par.data[2]);
-        exit(-1);
-    }
-    D("pdsm_atl_l2_proxy_reg(%d, %d, %d)=%d\n", par.data[0], par.data[1], par.data[2], res);
-    return res;
-}
 
 int pdsm_atl_dns_proxy_reg(struct CLIENT *clnt, int val0, int val1) {
     struct params par;
@@ -1440,26 +1408,6 @@ int pdsm_atl_dns_proxy_reg(struct CLIENT *clnt, int val0, int val1) {
         exit(-1);
     }
     D("pdsm_atl_dns_proxy(%d, %d)=%d\n", par.data[0], par.data[1], res);
-    return res;
-}
-
-int pdsm_client_pd_reg(struct CLIENT *clnt, int client, int val0, int val1, int val2, int val3, int val4) {
-    struct params par;
-    uint32_t res;
-    uint32_t par_data[6];
-    par.data = par_data;
-    par.length=6;
-    par.data[0]=client_IDs[client];
-    par.data[1]=val0;
-    par.data[2]=val1;
-    par.data[3]=val2;
-    par.data[4]=val3;
-    par.data[5]=val4;
-    if(clnt_call(clnt, 0x4, xdr_args, &par, xdr_result_int, &res, timeout)) {
-        D("pdsm_client_pd_reg(%x, %d, %d, %d, %x, %d) failed\n", par.data[0], par.data[1], par.data[2], par.data[3], par.data[4], par.data[5]);
-        exit(-1);
-    }
-    D("pdsm_client_pd_reg(%x, %d, %d, %d, %x, %d)=%d\n", par.data[0], par.data[1], par.data[2], par.data[3], par.data[4], par.data[5], res);
     return res;
 }
 

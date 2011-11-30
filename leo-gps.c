@@ -39,7 +39,6 @@
 
 #define  XTRA_BLOCK_SIZE  400
 #define  ENABLE_NMEA 1
-#define  DISABLE_CLEANUP   1 // fully shutting down the GPS is temporarily disabled
 
 #define  DUMP_DATA  0
 #define  GPS_DEBUG  1
@@ -68,38 +67,11 @@ static void *gps_timer_thread( void*  arg );
 
 static void *gps_get_position_thread( void*  arg );
 
-static pthread_t get_position_thread;
-
 static pthread_mutex_t get_position_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t get_position_cond = PTHREAD_COND_INITIALIZER;
 
 static pthread_mutex_t get_pos_ready_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t get_pos_ready_cond = PTHREAD_COND_INITIALIZER;
-
-static pthread_mutex_t xtra_data_inject_request_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t xtra_data_inject_request_cond = PTHREAD_COND_INITIALIZER;
-
-static pthread_mutex_t delete_delayed_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t delete_delayed_cond = PTHREAD_COND_INITIALIZER;
-
-static pthread_mutex_t delete_params_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t delete_params_cond = PTHREAD_COND_INITIALIZER;
-
-static pthread_mutex_t other_request_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t other_request_cond = PTHREAD_COND_INITIALIZER;
-
-pthread_t gps_delete_aiding_data_delayed_thread;
-pthread_t gps_xtra_inject_xtra_data_delayed_thread;
-
-static int get_pos = 0;
-static int event_running = 0;
-static int xtra_data_inject_request = 0;
-static int gps_delete_aiding_data_delayed_status = 0;
-
-static int clients_active = 0;
-static int unable_to_delete = 0;
-
-static sem_t mutex;
 
 static int started = 0;
 static int active = 0;
@@ -111,13 +83,6 @@ void update_gps_nmea(GpsUtcTime timestamp, const char* nmea, int length);
 
 extern uint8_t get_cleanup_value();
 extern uint8_t get_precision_value();
-
-typedef struct xtra_inject_info_struct
-{
-    char *data;
-	int length;
-} xtra_inject_info;
-
 
 /*****************************************************************/
 /*****************************************************************/
@@ -271,14 +236,12 @@ typedef struct {
     char     in[ NMEA_MAX_SIZE+1 ];
 } NmeaReader;
 
-static NmeaReader  reader;
-
 enum {
     STATE_QUIT  = 0,
     STATE_INIT  = 1,
     STATE_START = 2
 };
-/*
+
 typedef struct {
     int                     init;
     int                     fd;
@@ -288,23 +251,6 @@ typedef struct {
     GpsStatus               status;
     pthread_t               thread;
     pthread_t               pos_thread;
-#if ENABLE_NMEA
-    pthread_t               tmr_thread;
-    sem_t                   fix_sem;
-#endif
-    int                     fix_freq;
-    int                     control[2];
-    NmeaReader              reader;
-} GpsState;*/
-
-typedef struct {
-         int                     init;
-         int                     fd;
-	GpsCallbacks            callbacks;
-	GpsXtraCallbacks        xtra_callbacks;
-	AGpsCallbacks           agps_callbacks;
-	GpsStatus               status;
-	pthread_t               thread;
 #if ENABLE_NMEA
     pthread_t               tmr_thread;
     sem_t                   fix_sem;
@@ -501,13 +447,7 @@ nmea_reader_update_accuracy( NmeaReader*  r,
     r->fix.flags   |= GPS_LOCATION_HAS_ACCURACY;
     float precision = (float)get_precision_value();
     r->fix.accuracy = (float)str2float(tok.p, tok.end) * precision;
-	D("accuracy: %f", r->fix.accuracy);
-	if(r->fix.accuracy < 666)
-	{
-		D("Less Than 666");
-		r->fix.accuracy *= precision;
-	}
-	return 0;
+    return 0;
 }
 
 static int
@@ -750,37 +690,6 @@ nmea_reader_parse( NmeaReader*  r )
         update_gps_nmea(tv.tv_sec*1000+tv.tv_usec/1000, r->in, r->pos);
         report_nmea = 0;
     }
-    #if DUMP_DATA
-		D("r->fix.flags = 0x%x", r->fix.flags);
-	#endif
-		if (r->fix.flags & GPS_LOCATION_HAS_LAT_LONG) {
-			if (r->fix_flags_cached > 0)
-				r->fix.flags |= r->fix_flags_cached;
-			r->fix_flags_cached = r->fix.flags;
-			update_gps_location( &r->fix );
-	#if DUMP_DATA
-			D("r->fix.flags = 0x%x", r->fix.flags);
-	#endif
-			r->fix.flags = 0;
-		}
-    else
-	{
-		r->fix.latitude = 0;
-		r->fix.longitude = 0;
-		r->fix.altitude = 0;
-		r->fix.speed = 0;
-		r->fix.bearing = 0;
-		r->fix.timestamp = 0;
-		r->fix.flags = 0;
-		r->fix_flags_cached = 0;
-		
-		r->sv_status.used_in_fix_mask = 0ul;
-	}
-	
-	if (r->sv_status_changed) {
-		update_gps_svstatus( &r->sv_status );
-		r->sv_status_changed = 0;
-	}
 }
 
 static void
@@ -818,65 +727,13 @@ nmea_reader_addc( NmeaReader*  r, int  c )
 /*****************************************************************/
 /*****************************************************************/
 
-void delete_params_complete() 
-{
-    pthread_cond_signal(&delete_params_cond);
-}
-
-void pdsm_pd_event_gps_done_callback() 
-{
-    unable_to_delete = 0;
-	pthread_cond_signal(&delete_delayed_cond);
-}
-
-void pdsm_pd_event_done_callback() 
-{
-    event_running = 0;
-	if (xtra_data_inject_request > 0)
-	{
-		pthread_cond_signal(&xtra_data_inject_request_cond);
-	}
-	else
-	{
-		
-		pthread_cond_signal(&get_pos_ready_cond);
-	}
-}
-
-extern int64_t elapsed_realtime();
-
-static void* get_position_thread_method() 
-{
-    while(active)
-	{
-		while(get_pos)
-		{
-			if(gps_delete_aiding_data_delayed_status < 1)
-			{
-				event_running = 1;
-				unable_to_delete = 1;
-				gps_get_position();
-			}
-			pthread_mutex_lock(&get_pos_ready_mutex);
-			pthread_cond_wait(&get_pos_ready_cond, &get_pos_ready_mutex);
-			pthread_mutex_unlock(&get_pos_ready_mutex);
-		}
-		pthread_mutex_lock(&get_position_mutex);
-		pthread_cond_wait(&get_position_cond, &get_position_mutex);
-		pthread_mutex_unlock(&get_position_mutex);
-	}
-	D("get_position_thread finished");
-	return NULL;
-}
-
-
 /* commands sent to the gps thread */
 enum {
     CMD_QUIT  = 0,
     CMD_START = 1,
     CMD_STOP  = 2
 };
-/*
+
 static void gps_state_done( GpsState*  s ) {
 
     update_gps_status(GPS_STATUS_ENGINE_OFF);
@@ -903,22 +760,8 @@ static void gps_state_done( GpsState*  s ) {
 #if ENABLE_NMEA
     sem_destroy(&s->fix_sem);
 #endif
-}*/
-
-static void gps_state_done( GpsState*  s ) {
-    
-	get_pos = 0;
-	active = 0;
-	pthread_cond_signal(&get_pos_ready_cond);
-	pthread_cond_signal(&get_position_cond);
-	
-	s->init = 0;
-	
-	sem_destroy(&mutex);
-	
-	update_gps_status(GPS_STATUS_ENGINE_OFF);
 }
-/*
+
 static void gps_state_start( GpsState*  s ) {
     // Navigation started.
     update_gps_status(GPS_STATUS_SESSION_BEGIN);
@@ -933,17 +776,7 @@ static void gps_state_start( GpsState*  s ) {
         D("%s: could not send CMD_START command: ret=%d: %s",
         __FUNCTION__, ret, strerror(errno));
 }
-*/
 
-static void gps_state_start( GpsState*  s ) {
-    
-	get_pos = 1;
-	pthread_cond_signal(&get_position_cond);
-	
-	// Navigation started.
-	update_gps_status(GPS_STATUS_SESSION_BEGIN);
-}
-/*
 static void gps_state_stop( GpsState*  s ) {
     // Navigation ended.
     update_gps_status(GPS_STATUS_SESSION_END);
@@ -957,20 +790,6 @@ static void gps_state_stop( GpsState*  s ) {
     if (ret != 1)
         D("%s: could not send CMD_STOP command: ret=%d: %s",
         __FUNCTION__, ret, strerror(errno));
-}
-*/
-
-static void gps_state_stop( GpsState*  s ) {
-    
-	exit_gps_rpc();
-	
-	get_pos = 0;
-	
-	pthread_cond_signal(&get_pos_ready_cond);
-	
-	// Navigation ended.
-	update_gps_status(GPS_STATUS_SESSION_END);
-	
 }
 
 static int epoll_register( int  epoll_fd, int  fd ) {
@@ -1034,21 +853,6 @@ void update_gps_nmea(GpsUtcTime timestamp, const char* nmea, int length) {
     //Should be made thread safe...
     if(state->callbacks.nmea_cb)
         state->callbacks.nmea_cb(timestamp, nmea, length);
-}
-
-int32_t _fix_frequency;//Which is a period not a frequency, but nvm.
-
-void pass_nmea(char *sentence, int length)
-{
-    int nn;
-	
-	sem_wait(&mutex);
-	if (length > 0) {
-		for (nn = 0; nn < length; nn++) {
-			nmea_reader_addc(&reader, sentence[nn]);
-		}
-	}
-	sem_post(&mutex);
 }
 
 /* this is the main thread, it waits for commands from gps_state_start/stop and,
@@ -1175,11 +979,9 @@ static void* gps_timer_thread( void*  arg ) {
     r->fix_flags_cached = 0;
     r->sv_status_changed = 0;
     r->sv_status.num_svs = 0;
-    usleep((uint64_t)500000);
     memset( r->sv_status.sv_list, 0, sizeof(r->sv_status.sv_list) );
-    int fix_temp = state->fix_freq;
+
     do {
-        state->fix_freq = 1;
         GPS_STATE_LOCK_FIX(state);
 
 #if DUMP_DATA
@@ -1202,7 +1004,6 @@ static void* gps_timer_thread( void*  arg ) {
             r->sv_status_changed = 0;
         }
         GPS_STATE_UNLOCK_FIX(state);
-        state->fix_freq = fix_temp;
         if (r->fix_flags_cached) {        
             int elapsed = 0;
             clock_t now = clock();
@@ -1213,7 +1014,7 @@ static void* gps_timer_thread( void*  arg ) {
         }
         else
             usleep((uint64_t)500000);
-    fix_temp = state->fix_freq;
+
     } while(state->init == STATE_START);
 
     D("%s() destroyed", __FUNCTION__);
@@ -1244,7 +1045,7 @@ static void* gps_get_position_thread( void*  arg ) {
     D("%s() destroyed", __FUNCTION__);
     return NULL;
 }
-/*
+
 static void gps_state_init( GpsState*  state ) {
 
     update_gps_status(GPS_STATUS_ENGINE_ON);
@@ -1292,33 +1093,7 @@ static void gps_state_init( GpsState*  state ) {
 Fail:
     gps_state_done( state );
 }
-*/
 
-static void gps_state_init( GpsState*  state ) {
-
-    state->init = 1;
-
-	active = 1;
-	
-	if ( pthread_create( &get_position_thread, NULL, get_position_thread_method, NULL ) != 0 ) {
-		LOGE("could not create gps thread: %s", strerror(errno));
-		goto Fail;
-	}
-
-	if(init_leo())
-		goto Fail;
-	
-	nmea_reader_init(&reader);
-	sem_init(&mutex, 0, 1);
-
-	D("gps state initialized");
-	return;
-	
-	update_gps_status(GPS_STATUS_ENGINE_ON);
-
-Fail:
-	gps_state_done( state );
-}
 /*****************************************************************/
 /*****************************************************************/
 /*****                                                       *****/
@@ -1338,116 +1113,6 @@ static int gps_xtra_init(GpsXtraCallbacks* callbacks) {
     return 0;
 }
 
-static void *gps_xtra_inject_xtra_data_delayed(void *input)
-{
-    D("%s() is called", __FUNCTION__);
-	xtra_inject_info *in;
-	char *data;
-	int length = 0;
-	int rpc_ret_val = -1;
-	int ret_val = -1;
-	unsigned char *xtra_data_ptr;
-	uint32_t  part_len;
-	uint8_t   part;
-	uint8_t   total_parts;
-	uint16_t  len_injected;
-	
-	in = (xtra_inject_info *)input;
-	data = in->data;
-	length = in->length;
-	
-	total_parts = (length / XTRA_BLOCK_SIZE);
-	if ((total_parts % XTRA_BLOCK_SIZE) != 0)
-	{
-		total_parts += 1;
-	}
-
-	len_injected = 0; // O bytes injected
-	xtra_data_ptr = data;
-	
-	if(gps_delete_aiding_data_delayed_status > 0)
-	{
-		pthread_mutex_lock(&other_request_mutex);
-		pthread_cond_wait(&other_request_cond, &other_request_mutex);
-		pthread_mutex_unlock(&other_request_mutex);
-	}
-	
-	if(event_running > 0)
-	{
-		exit_gps_rpc();
-		
-		pthread_mutex_lock(&xtra_data_inject_request_mutex);
-		pthread_cond_wait(&xtra_data_inject_request_cond, &xtra_data_inject_request_mutex);
-		pthread_mutex_unlock(&xtra_data_inject_request_mutex);
-	}
-	
-	// XTRA injection starts with part 1
-	for (part = 1; part <= total_parts; part++)
-	{
-		if ((length - len_injected) < XTRA_BLOCK_SIZE)
-		{
-			part_len = length - len_injected;
-		} else {
-			part_len = XTRA_BLOCK_SIZE;
-		}    
-		
-		D("gps_xtra_inject_xtra_data: inject part = %d/%d, len = %d\n", part, total_parts, part_len);
-		rpc_ret_val = gps_xtra_set_data(xtra_data_ptr, part_len, part, total_parts);
-		if (rpc_ret_val == -1)
-		{
-			D("gps_xtra_set_data() for xtra returned %d \n", rpc_ret_val);
-			ret_val = EINVAL; // return error
-			break;
-		}
-		
-		xtra_data_ptr += part_len;
-		len_injected += part_len;
-	}
-	
-	xtra_data_inject_request = 0;
-	
-	if (gps_delete_aiding_data_delayed_status > 0)
-	{
-		pthread_cond_signal(&other_request_cond);
-	}
-	else if (get_pos > 0)
-	{
-		pdsm_pd_event_done_callback();
-	}
-	
-	free(in->data);
-	free(in);
-
-	return NULL;
-}
-
-static int gps_xtra_inject_xtra_data(char* data, int length) {
-    D("%s() is called", __FUNCTION__);
-	D("gps_xtra_inject_xtra_data: xtra size = %d, data ptr = 0x%x\n", length, (int) data);
-	xtra_inject_info *input=NULL;
-	GpsState*  s = _gps_state;
-	if (!s->init)
-		return 0;
-	
-	if (xtra_data_inject_request < 1)
-	{
-		xtra_data_inject_request = 1;
-		input = malloc(sizeof(xtra_inject_info));
-		input->data = malloc(length);
-		memcpy(input->data, data, length);
-		input->length = length;
-		
-		pthread_create(&gps_xtra_inject_xtra_data_delayed_thread, NULL, gps_xtra_inject_xtra_data_delayed, (void *)input);
-	}
-	else 
-	{
-		return 0;
-	}
-	
-	return 1;
-}
-
-/*
 static int gps_xtra_inject_xtra_data(char* data, int length) {
     D("%s() is called", __FUNCTION__);
     D("gps_xtra_inject_xtra_data: xtra size = %d, data ptr = 0x%x\n", length, (int) data);
@@ -1512,7 +1177,7 @@ static int gps_xtra_inject_xtra_data(char* data, int length) {
 
     return ret_val;
 }
-*/
+
 void xtra_download_request() {
     D("%s() is called", __FUNCTION__);
      GpsState*  state = _gps_state;
@@ -1580,21 +1245,11 @@ static int gps_init(GpsCallbacks* callbacks) {
 
     s->callbacks = *callbacks;
 
-#if DISABLE_CLEANUP
-    reactivate_rpc_clients();
-#endif
-
     return 0;
 }
 
 static void gps_cleanup() {
     D("%s() is called", __FUNCTION__);
-    
-#if DISABLE_CLEANUP
-    deactivate_rpc_clients();
-	return;
-#else
-
     if (get_cleanup_value()) {
         GpsState*  s = _gps_state;
 
@@ -1603,7 +1258,6 @@ static void gps_cleanup() {
             cleanup_gps_rpc_clients();
         }
     }
-#endif
 }
 
 static int gps_start() {
@@ -1653,72 +1307,10 @@ static int gps_inject_location(double latitude, double longitude, float accuracy
     return 0;
 }
 
-static void* gps_delete_aiding_data_delayed(void * flags)
-{
-    uint32_t *flags_in = (uint32_t *)flags;
-	
-	if (xtra_data_inject_request > 0)
-	{
-		pthread_mutex_lock(&other_request_mutex);
-		pthread_cond_wait(&other_request_cond, &other_request_mutex);
-		pthread_mutex_unlock(&other_request_mutex);
-	}
-	
-	if (event_running > 0) 
-	{
-		exit_gps_rpc();
-	}
-	
-	if(unable_to_delete > 0)
-	{
-		pthread_mutex_lock(&delete_delayed_mutex);
-		pthread_cond_wait(&delete_delayed_cond, &delete_delayed_mutex);
-		pthread_mutex_unlock(&delete_delayed_mutex);
-	}
-	
-	if(clients_active)
-	{
-		gps_delete_data(*flags_in);
-		
-		pthread_mutex_lock(&delete_params_mutex);
-		pthread_cond_wait(&delete_params_cond, &delete_params_mutex);
-		pthread_mutex_unlock(&delete_params_mutex);
-	}
-	
-	gps_delete_aiding_data_delayed_status = 0;
-	
-	if (xtra_data_inject_request > 0)
-	{
-		pthread_cond_signal(&other_request_cond);
-	}
-	else if (get_pos > 0)
-	{
-		pdsm_pd_event_done_callback();
-	}
-	
-	return NULL;
-}
-
 static void gps_delete_aiding_data(GpsAidingData flags) {
     D("%s() is called", __FUNCTION__);
     D("flags=%d", flags);
-
-    if(unable_to_delete > 0 || xtra_data_inject_request > 0)
-	{
-		if (gps_delete_aiding_data_delayed_status < 1)
-		{
-			gps_delete_aiding_data_delayed_status = 1;
-			pthread_create(&gps_delete_aiding_data_delayed_thread, NULL, gps_delete_aiding_data_delayed, &flags);
-		}
-		else
-		{
-			return;
-		}
-		return;
-	}
-	
-	gps_delete_data(flags);
-    
+    /* not yet implemented */
 }
 
 static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
@@ -1737,17 +1329,6 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
     }
     // fix_frequency is only used by NMEA version
     s->fix_freq = fix_frequency;
-    _fix_frequency=fix_frequency;
-	if(_fix_frequency==0) {
-		//We don't handle single shot requests atm...
-		//So one every 1 seconds will it be.
-		_fix_frequency=1;
-	}
-	if(_fix_frequency>8) {
-		//Ok, A9 will timeout with so high value.
-		//Set it to 8.
-		_fix_frequency=8;
-	}
     return 0;
 }
 
@@ -1777,11 +1358,6 @@ const GpsInterface* gps_get_hardware_interface()
 {
     D("%s() is called", __FUNCTION__);
     return &hardwareGpsInterface;
-}
-
-void set_clients_active(int active)
-{
-    clients_active = active;
 }
 
 // END OF FILE

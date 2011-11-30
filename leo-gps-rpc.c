@@ -1750,7 +1750,7 @@ void dispatch_pdsm_xtra(uint32_t *data)
 		xtra_download_request();
 	}
 }
-
+/*
 void dispatch_pdsm_xtra_req(uint8_t *data) {
     //Handles download requests from gps chip
     //Have to check if it is a download request because the same procid is multipurpose
@@ -1767,7 +1767,7 @@ void dispatch_pdsm_xtra_req(uint8_t *data) {
         //Calls the gps_xtra_download_request callback method
         xtra_download_request();
     }
-}
+}*/
 
 void dispatch_pdsm(uint32_t *data) {
     uint32_t procid=ntohl(data[5]);

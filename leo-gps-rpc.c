@@ -96,11 +96,11 @@ static struct timeval timeout;
 static SVCXPRT *_svc;
 
 static uint8_t CHECKED[4] = {0};
-static uint8_t XTRA_AUTO_DOWNLOAD_ENABLED = 0;
-static uint8_t XTRA_DOWNLOAD_INTERVAL = 24;  // hours
-static uint8_t CLEANUP_ENABLED = 1;
-static uint8_t SESSION_TIMEOUT = 2;  // seconds
-static uint8_t MEASUREMENT_PRECISION = 10;  // meters
+static uint8_t XTRA_AUTO_DOWNLOAD_ENABLED = 1;
+static uint8_t XTRA_DOWNLOAD_INTERVAL = 2;  // hours
+static uint8_t CLEANUP_ENABLED = 0;
+static uint8_t SESSION_TIMEOUT = 200;  // seconds
+static uint8_t MEASUREMENT_PRECISION = 15;  // meters
 
 struct params {
     uint32_t *data;
@@ -689,6 +689,7 @@ void dispatch_pdsm_pd(uint32_t *data) {
         // convert gps time to epoch time ms
         fix.timestamp += 315964800; // 1/1/1970 to 1/6/1980
         fix.timestamp -= 15; // 15 leap seconds between 1980 and 2011
+        fix.timestamp += 1; // sync with NTP
         fix.timestamp *= 1000; //ms
 
         fix.flags |= GPS_LOCATION_HAS_LAT_LONG;
@@ -905,7 +906,7 @@ int parse_gps_conf() {
             if (result != NULL) {
                 result = result+strlen(check_timeout)+1;
                 i = atoi(result);
-                if (i>1 && i<121)
+                if (i>1 && i<302)
                     SESSION_TIMEOUT = i;
                 CHECKED[3] = 1;
             }

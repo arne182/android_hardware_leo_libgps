@@ -1334,10 +1334,11 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
         fix_frequency = 8;
     }
     // fix_frequency is only used by NMEA version
-    s->fix_freq = fix_frequency;
+    s->fix_freq = -1;
     s->init == STATE_INIT;
     usleep(500000);
     s->init == STATE_START;
+    s->fix_freq = fix_frequency;
     return 0;
 }
 

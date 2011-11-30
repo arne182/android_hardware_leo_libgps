@@ -1324,8 +1324,11 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
         //We don't handle single shot requests atm...
         //So one every 1 seconds will it be.
         fix_frequency = 1;
-    } else if (fix_frequency > 1800) { //30mins
+    /*} else if (fix_frequency > 1800) { //30mins
         fix_frequency = 1800;
+    }*/
+    } else if (fix_frequency > 8) { //time out problems
+        fix_frequency = 8;
     }
     // fix_frequency is only used by NMEA version
     s->fix_freq = fix_frequency;

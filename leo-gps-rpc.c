@@ -2121,7 +2121,7 @@ int gps_xtra_set_auto_params()
 	
 		if (check == 1) {
 			D("pdsm_xtra_set_auto_download_params boolean: %u interval: %u", boolean, interval);
-			res = pdsm_xtra_set_auto_download_params(_clnt, 0, client_IDs[0xb], 0, boolean, interval);
+			res = pdsm_xtra_set_auto_download_params(0, 0xB, 0, boolean, interval);
 		}
 		else if (check == -1) {
 			D("Error with check_gps_xtra_auto_param_stored");

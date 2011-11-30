@@ -2108,21 +2108,20 @@ int gps_xtra_set_auto_params()
 	//Set xtra auto download parameters
 	xtra_conf_auto_params xtra_conf_auto_param;
 	uint32_t res = -1;
-	uint8_t boolean;
-	uint16_t interval;
 	int check;
-	
+        uint8_t boolean = XTRA_AUTO_DOWNLOAD_ENABLED; //Enable/Disable
+        uint16_t interval = XTRA_DOWNLOAD_INTERVAL; //Interval in hours 1 to 168(Week)
 	read_gps_xtra_auto_params(&(xtra_conf_auto_param));
 	
-	boolean = xtra_conf_auto_param.auto_enable;
-	interval = xtra_conf_auto_param.interval;
+//	boolean = xtra_conf_auto_param.auto_enable;
+//	interval = xtra_conf_auto_param.interval;
 	
 	if (boolean < 2 && interval > 0 && interval < 169) {
 		check = check_gps_xtra_auto_param_stored(boolean, interval);
 	
 		if (check == 1) {
 			D("pdsm_xtra_set_auto_download_params boolean: %u interval: %u", boolean, interval);
-			res = pdsm_xtra_set_auto_download_params(0, 0xB, 0, boolean, interval);
+			res = pdsm_xtra_set_auto_download_params(_clnt, 0, client_IDs[0xb], 0, boolean, interval);
 		}
 		else if (check == -1) {
 			D("Error with check_gps_xtra_auto_param_stored");

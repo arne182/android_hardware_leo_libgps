@@ -271,6 +271,8 @@ typedef struct {
     char     in[ NMEA_MAX_SIZE+1 ];
 } NmeaReader;
 
+static NmeaReader  reader;
+
 enum {
     STATE_QUIT  = 0,
     STATE_INIT  = 1,

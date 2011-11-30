@@ -298,7 +298,8 @@ typedef struct {
 } GpsState;*/
 
 typedef struct {
-    int                     init;
+         int                     init;
+         int                     fd;
 	GpsCallbacks            callbacks;
 	GpsXtraCallbacks        xtra_callbacks;
 	AGpsCallbacks           agps_callbacks;
@@ -309,7 +310,7 @@ typedef struct {
     sem_t                   fix_sem;
 #endif
     int                     fix_freq;
-	int                     control[2];
+    int                     control[2];
     NmeaReader              reader;
 } GpsState;
 

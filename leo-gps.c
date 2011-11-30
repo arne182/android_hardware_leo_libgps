@@ -499,12 +499,13 @@ nmea_reader_update_accuracy( NmeaReader*  r,
         return -1;
 
     r->fix.flags   |= GPS_LOCATION_HAS_ACCURACY;
-    r->fix.accuracy = (float)str2float(tok.p, tok.end);
+    float precision = (float)get_precision_value();
+    r->fix.accuracy = (float)str2float(tok.p, tok.end) * precision;
 	D("accuracy: %f", r->fix.accuracy);
 	if(r->fix.accuracy < 666)
 	{
 		D("Less Than 666");
-		r->fix.accuracy *= MEASUREMENT_PRECISION;
+		r->fix.accuracy *= precision;
 	}
 	return 0;
 }

@@ -40,8 +40,8 @@
 
 #define  ENABLE_NMEA 1
 
-#define  DUMP_DATA  1
-#define  GPS_DEBUG  1
+#define  DUMP_DATA  0
+#define  GPS_DEBUG  0
 
 #if GPS_DEBUG
 #  define  D(...)   LOGD(__VA_ARGS__)

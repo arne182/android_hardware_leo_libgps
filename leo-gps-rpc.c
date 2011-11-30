@@ -1668,6 +1668,24 @@ void dump_response(char* path, uint32_t *data) {
 	}
 }
 
+void dispatch_pdsm_ext(char *data) 
+{	
+	int length;
+	char *sentence;
+	
+	length = strlen(data+0x24);
+	sentence = malloc(length);
+	strncpy(sentence, data+0x24, length);
+	
+	if(strncmp(sentence, "$GP", 3) == 0)
+	{
+		pass_nmea(sentence, length);
+	}
+	
+	free(sentence);
+}
+
+/*
 void dispatch_pdsm_ext(uint32_t *data) {
     GpsSvStatus ret;
     int i;
@@ -1698,7 +1716,7 @@ void dispatch_pdsm_ext(uint32_t *data) {
     //ret.used_in_fix_mask=ntohl(data[9]);
     ret.used_in_fix_mask=0;
     update_gps_svstatus(&ret);
-}
+}*/
 
 void dispatch_pdsm_pa_cmd(uint32_t *data)
 {    

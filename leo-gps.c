@@ -84,6 +84,8 @@ void update_gps_nmea(GpsUtcTime timestamp, const char* nmea, int length);
 extern uint8_t get_cleanup_value();
 extern uint8_t get_precision_value();
 
+int32_t _fix_frequency;//Which is a period not a frequency, but nvm.
+
 /*****************************************************************/
 /*****************************************************************/
 /*****                                                       *****/
@@ -1319,7 +1321,7 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
     GpsState*  s = _gps_state;
     if (!s->init)
         return 0;
-
+    _fix_frequency = fix_frequency;
     if (fix_frequency == 0) {
         //We don't handle single shot requests atm...
         //So one every 1 seconds will it be.
@@ -1328,10 +1330,14 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
         fix_frequency = 1800;
     }*/
     } else if (fix_frequency > 8) { //time out problems
+        
         fix_frequency = 8;
     }
     // fix_frequency is only used by NMEA version
     s->fix_freq = fix_frequency;
+    state->init == STATE_INIT;
+    usleep(500000);
+    state->init == STATE_START;
     return 0;
 }
 

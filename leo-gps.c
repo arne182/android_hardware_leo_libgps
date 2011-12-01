@@ -336,7 +336,7 @@ nmea_reader_update_time( NmeaReader*  r, Token  tok )
     D("fix_time=%d", fix_time); // UTC time + utc_diff
 #endif
 
-    r->fix.timestamp = (long long)fix_time * 1000 + (int)((seconds+1)*1000)%1000;;
+    r->fix.timestamp = (long long)fix_time * 1000 + (int)((seconds+2)*1000)%1000;;
     return 0;
 }
 
@@ -1329,9 +1329,9 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
     /*} else if (fix_frequency > 1800) { //30mins
         fix_frequency = 1800;
     }*/
-    } else if (fix_frequency > 8) { //time out problems
+    } else if (fix_frequency > 301) { //time out problems
         
-        fix_frequency = 8;
+        fix_frequency = 300;
     }
     // fix_frequency is only used by NMEA version
     s->fix_freq = fix_frequency;

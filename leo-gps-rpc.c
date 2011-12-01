@@ -689,7 +689,7 @@ void dispatch_pdsm_pd(uint32_t *data) {
         // convert gps time to epoch time ms
         fix.timestamp += 315964800; // 1/1/1970 to 1/6/1980
         fix.timestamp -= 15; // 15 leap seconds between 1980 and 2011
-        fix.timestamp += 1; // sync with NTP
+        fix.timestamp += 2; // sync with NTP
         fix.timestamp *= 1000; //ms
 
         fix.flags |= GPS_LOCATION_HAS_LAT_LONG;

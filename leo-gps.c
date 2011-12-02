@@ -1012,7 +1012,7 @@ static void* gps_timer_thread( void*  arg ) {
             do{
                 usleep((uint64_t)500000);
                 elapsed = (clock()-now)/CLOCKS_PER_SEC;
-            }while(elapsed<state->_fix_frequency);
+            }while(elapsed<_fix_frequency);
         }
         else
             usleep((uint64_t)500000);

@@ -1005,14 +1005,14 @@ static void* gps_timer_thread( void*  arg ) {
             update_gps_svstatus( &r->sv_status );
             r->sv_status_changed = 0;
         }
-        GPS_STATE_UNLOCK_FIX(state);
+        GPS_STATE_UNLOCK_FIX(state)
         if (r->fix_flags_cached) {        
             int elapsed = 0;
             clock_t now = clock();
             do{
                 usleep((uint64_t)500000);
                 elapsed = (clock()-now)/CLOCKS_PER_SEC;
-            }while(elapsed<state->fix_freq);
+            }while(elapsed<state->_fix_frequency);
         }
         else
             usleep((uint64_t)500000);
@@ -1329,9 +1329,9 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
     /*} else if (fix_frequency > 1800) { //30mins
         fix_frequency = 1800;
     }*/
-    } else if (fix_frequency > 301) { //time out problems
+    } else if (fix_frequency > 5) { //time out problems
         
-        fix_frequency = 300;
+        fix_frequency = 5;
     }
     // fix_frequency is only used by NMEA version
     s->fix_freq = fix_frequency;

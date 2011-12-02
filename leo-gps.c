@@ -1320,7 +1320,6 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
     GpsState*  s = _gps_state;
     if (!s->init)
         return 0;
-    _fix_frequency = fix_frequency;
     if (fix_frequency == 0) {
         //We don't handle single shot requests atm...
         //So one every 1 seconds will it be.

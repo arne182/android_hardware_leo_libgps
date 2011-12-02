@@ -84,7 +84,6 @@ void update_gps_nmea(GpsUtcTime timestamp, const char* nmea, int length);
 extern uint8_t get_cleanup_value();
 extern uint8_t get_precision_value();
 
-int32_t _fix_frequency;//Which is a period not a frequency, but nvm.
 
 /*****************************************************************/
 /*****************************************************************/
@@ -1012,7 +1011,7 @@ static void* gps_timer_thread( void*  arg ) {
             do{
                 usleep((uint64_t)500000);
                 elapsed = (clock()-now)/CLOCKS_PER_SEC;
-            }while(elapsed<_fix_frequency);
+            }while(elapsed<state->fix_freq);
         }
         else
             usleep((uint64_t)500000);

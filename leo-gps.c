@@ -1005,7 +1005,7 @@ static void* gps_timer_thread( void*  arg ) {
             update_gps_svstatus( &r->sv_status );
             r->sv_status_changed = 0;
         }
-        GPS_STATE_UNLOCK_FIX(state)
+        GPS_STATE_UNLOCK_FIX(state);
         if (r->fix_flags_cached) {        
             int elapsed = 0;
             clock_t now = clock();

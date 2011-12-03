@@ -1052,7 +1052,8 @@ void dispatch_pdsm_pd(uint32_t *data) {
     }
     if(event&PDSM_PD_EVENT_GPS_DONE) {
         D("PDSM_PD_EVENT_GPS_DONE");
-        no_fix = 1;
+        pdsm_pd_event_gps_done_callback();
+        //no_fix = 1;
     }
     GpsLocation fix;
     fix.flags = 0;

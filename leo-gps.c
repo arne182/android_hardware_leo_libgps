@@ -91,6 +91,7 @@ pthread_t gps_delete_aiding_data_delayed_thread;
 pthread_t gps_xtra_inject_xtra_data_delayed_thread;
 
 static int started = 0;
+static float DOP = 0;
 static int active = 0;
 static int get_pos = 0;
 static int clients_active = 0;
@@ -475,10 +476,12 @@ nmea_reader_update_accuracy( NmeaReader*  r,
     D("accuracy: %f", r->fix.accuracy);
     r->fix.flags   |= GPS_LOCATION_HAS_ACCURACY;
     float precision = (float)get_precision_value();
-    if(r->fix.accuracy < 666)
+    DOP = (float)str2float(tok.p, tok.end);
+    D("DOP: %f", (float)str2float(tok.p, tok.end));
+    if(DOP < 666)
     {
     	D("Less Than 666");
-    	r->fix.accuracy = (float)str2float(tok.p, tok.end) * precision;
+    	r->fix.accuracy = DOP * precision;
     }
     
     return 0;
@@ -688,7 +691,8 @@ nmea_reader_parse( NmeaReader*  r )
         D("unknown sentence '%.*s", tok.end-tok.p, tok.p);
 #endif
     }
-    if(r->fix.accuracy < 666)
+    D("DOP = %f", DOP);
+    if(DOP < 666)
     {
 #if DUMP_DATA
     if (r->fix.flags) {

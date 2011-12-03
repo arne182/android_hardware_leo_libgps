@@ -267,6 +267,46 @@ static bool_t xdr_rpc_pdsm_pa_mo_method_e_type(XDR *xdrs, pdsm_pa_mo_method_e_ty
 	return 1;
 }
 
+static bool_t xdr_rpc_pdsm_server_url_address_type(XDR *xdrs, pdsm_server_url_address_type *pdsm_server_url_address_type)
+{
+	if(!xdr_u_char(xdrs, &pdsm_server_url_address_type->val0))
+		return 0;
+	if(!xdr_opaque(xdrs, pdsm_server_url_address_type->byte_array, pdsm_server_url_address_type->val0)) //Not sure if val0 is the size
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_server_ipv4_address_type(XDR *xdrs, pdsm_server_ipv4_address_type *pdsm_server_ipv4_address_type)
+{
+	if (!xdr_u_long(xdrs, &pdsm_server_ipv4_address_type->val0))
+		return 0;
+	if (!xdr_u_long(xdrs, &pdsm_server_ipv4_address_type->val1))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_pd_server_address_u_type(XDR *xdrs, pdsm_server_address_u_type *pdsm_server_address_u_type)
+{
+	if(!xdr_u_long(xdrs, &pdsm_server_address_u_type->pdsm_server_address_e_type))
+		return 0;
+	if(pdsm_server_address_u_type->pdsm_server_address_e_type == 0)
+	{
+		if(!xdr_rpc_pdsm_server_ipv4_address_type(xdrs, pdsm_server_address_u_type->address_struct))
+			return 0;   
+	}
+	else if (pdsm_server_address_u_type->pdsm_server_address_e_type == 1)
+	{
+		if(!xdr_rpc_pdsm_server_url_address_type(xdrs, pdsm_server_address_u_type->address_struct))
+			return 0;
+	}
+	else if(pdsm_server_address_u_type->pdsm_server_address_e_type == 2)
+	{
+		//ipv6
+	}
+	return 1;
+}
 
 static bool_t xdr_rpc_pdsm_pd_server_address_s_type(XDR *xdrs, pdsm_server_address_s_type *pdsm_server_address_s_type)
 {

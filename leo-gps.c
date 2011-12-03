@@ -1273,6 +1273,32 @@ static void *gps_xtra_inject_xtra_data_delayed(void *input)
 }
 
 static int gps_xtra_inject_xtra_data(char* data, int length) {
+	D("%s() is called", __FUNCTION__);
+	D("gps_xtra_inject_xtra_data: xtra size = %d, data ptr = 0x%x\n", length, (int) data);
+	xtra_inject_info *input=NULL;
+	GpsState*  s = _gps_state;
+	if (!s->init)
+		return 0;
+	
+	if (xtra_data_inject_request < 1)
+	{
+		xtra_data_inject_request = 1;
+		input = malloc(sizeof(xtra_inject_info));
+		input->data = malloc(length);
+		memcpy(input->data, data, length);
+		input->length = length;
+		
+		pthread_create(&gps_xtra_inject_xtra_data_delayed_thread, NULL, gps_xtra_inject_xtra_data_delayed, (void *)input);
+	}
+	else 
+	{
+		return 0;
+	}
+	
+	return 1;
+}
+
+/*static int gps_xtra_inject_xtra_data(char* data, int length) {
     D("%s() is called", __FUNCTION__);
     D("gps_xtra_inject_xtra_data: xtra size = %d, data ptr = 0x%x\n", length, (int) data);
     GpsState*  s = _gps_state;
@@ -1335,7 +1361,7 @@ static int gps_xtra_inject_xtra_data(char* data, int length) {
     }
 
     return ret_val;
-}
+}*/
 
 void xtra_download_request() {
     D("%s() is called", __FUNCTION__);

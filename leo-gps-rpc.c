@@ -1183,7 +1183,39 @@ void dispatch_pdsm_ext(uint32_t *data) {
     update_gps_svstatus(&ret);
 }
 
-void dispatch_pdsm_xtra_req(uint8_t *data) {
+void dispatch_pdsm_pa_cmd(uint32_t *data)
+{	
+	uint32_t pa_cmd=ntohl(data[2]);
+	uint32_t pa_error=ntohl(data[3]);
+	
+	D("pa_cmd: %d", pa_cmd);
+	D("pa_error: %d", pa_error);
+}
+
+void dispatch_pdsm_pa(uint32_t *data)
+{
+	uint32_t pa_client=ntohl(data[0]);
+	uint32_t pa_param=ntohl(data[1]);
+	
+	D("Client: %d", pa_client);
+	D("Parameter: %d", pa_param);
+	
+	if(pa_param == 4)
+	{
+		delete_params_complete();
+	}
+}
+
+void dispatch_pdsm_xtra_cmd(uint32_t * data)
+{
+	uint32_t xtra_cmd=ntohl(data[2]);
+	uint32_t xtra_error=ntohl(data[3]);
+	
+	D("xtra_cmd: %d", xtra_cmd);
+	D("xtra_error: %d", xtra_error);
+}
+
+void dispatch_pdsm_xtra(uint8_t *data) {
     //Handles download requests from gps chip
     //Have to check if it is a download request because the same procid is multipurpose
     
@@ -1200,7 +1232,7 @@ void dispatch_pdsm_xtra_req(uint8_t *data) {
         xtra_download_request();
     }
 }
-
+/*
 void dispatch_pdsm(uint32_t *data) {
     uint32_t procid=ntohl(data[5]);
     D("%s() is called. data[5]=procid=%d", __FUNCTION__, procid);
@@ -1210,6 +1242,26 @@ void dispatch_pdsm(uint32_t *data) {
         dispatch_pdsm_ext(&(data[10]));
     else if(procid==5)
         dispatch_pdsm_xtra_req(&(data[10]));
+}*/
+
+void dispatch_pdsm(uint32_t *data) {
+	uint32_t procid=ntohl(data[5]);
+	D("%s() is called. data[5]=procid=%d", __FUNCTION__, procid);
+	if(procid==1) 
+		dispatch_pdsm_pd(&(data[10]));
+	else if(procid==2)
+		dispatch_pdsm_pa(&(data[14]));
+	else if(procid==4) 
+		dispatch_pdsm_ext(&(data[10]));
+	else if(procid==5)
+		dispatch_pdsm_xtra(&(data[10]));
+	else if(procid==11)
+		dispatch_pdsm_pd_cmd(&(data[10]));
+	else if(procid==12)
+		dispatch_pdsm_pa_cmd(&(data[10]));
+	else if(procid==15)
+		dispatch_pdsm_xtra_cmd(&(data[10]));
+		
 }
 
 void dispatch_atl(uint32_t *data) {

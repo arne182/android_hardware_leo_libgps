@@ -769,6 +769,32 @@ void pdsm_pd_event_done_callback()
 	}
 }
 
+extern int64_t elapsed_realtime();
+
+static void* get_position_thread_method() 
+{
+	while(active)
+	{
+		while(get_pos)
+		{
+			if(gps_delete_aiding_data_delayed_status < 1)
+			{
+				event_running = 1;
+				unable_to_delete = 1;
+				gps_get_position();
+			}
+			pthread_mutex_lock(&get_pos_ready_mutex);
+			pthread_cond_wait(&get_pos_ready_cond, &get_pos_ready_mutex);
+			pthread_mutex_unlock(&get_pos_ready_mutex);
+		}
+		pthread_mutex_lock(&get_position_mutex);
+		pthread_cond_wait(&get_position_cond, &get_position_mutex);
+		pthread_mutex_unlock(&get_position_mutex);
+	}
+	D("get_position_thread finished");
+	return NULL;
+}
+
 static void gps_state_done( GpsState*  s ) {
 
     update_gps_status(GPS_STATUS_ENGINE_OFF);
@@ -1083,7 +1109,7 @@ static void* gps_get_position_thread( void*  arg ) {
 
 static void gps_state_init( GpsState*  state ) {
 
-    update_gps_status(GPS_STATUS_ENGINE_ON);
+    
 
     state->init       = STATE_INIT;;
     state->control[0] = -1;
@@ -1096,6 +1122,11 @@ static void gps_state_init( GpsState*  state ) {
 #endif
 
     active = 1;
+    
+    if ( pthread_create( &get_position_thread, NULL, get_position_thread_method, NULL ) != 0 ) {
+        LOGE("could not create gps thread: %s", strerror(errno));
+        goto Fail;
+    }
 
 #if ENABLE_NMEA
     if ( sem_init(&state->fix_sem, 0, 1) != 0 ) {
@@ -1114,16 +1145,18 @@ static void gps_state_init( GpsState*  state ) {
         goto Fail;
     }
 
-    if ( pthread_create( &state->pos_thread, NULL, gps_get_position_thread, NULL ) != 0 ) {
-        LOGE("could not create gps_get_position_thread: %s", strerror(errno));
-        goto Fail;
-    }
+//    if ( pthread_create( &state->pos_thread, NULL, gps_get_position_thread, NULL ) != 0 ) {
+//        LOGE("could not create gps_get_position_thread: %s", strerror(errno));
+//        goto Fail;
+//    }
 
     if(init_gps_rpc())
         goto Fail;
 
     D("gps state initialized");
     return;
+    
+    update_gps_status(GPS_STATUS_ENGINE_ON);
 
 Fail:
     gps_state_done( state );

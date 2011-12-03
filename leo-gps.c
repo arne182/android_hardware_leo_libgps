@@ -737,7 +737,7 @@ nmea_reader_parse( NmeaReader*  r )
 		r->fix.timestamp = 0;
 		r->fix.flags = 0;
 		r->fix_flags_cached = 0;
-		
+		D("DATA Cleared because fix is greater than 666");
 		r->sv_status.used_in_fix_mask = 0ul;
 	}
 }

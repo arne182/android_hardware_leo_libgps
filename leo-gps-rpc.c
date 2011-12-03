@@ -1157,7 +1157,7 @@ int gps_delete_data(uint32_t flags) {
 	pdsm_pa_info_type.pa_set = 4;
 	pdsm_pa_info_type.pa_ptr = &pdsm_delete_parms_type;
 	
-	res = pdsm_set_parameters(0, 0, 0, &pdsm_pa_info_type, 0x1);
+	res = pdsm_set_parameters(_clnt,0x1,0, 0, 0, &pdsm_pa_info_type);
 	
 	return res;
 }

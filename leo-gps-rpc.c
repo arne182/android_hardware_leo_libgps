@@ -50,6 +50,10 @@
 #endif
 
 typedef uint32_t pdsm_pa_e_type;
+typedef int pdsm_client_id_type;
+typedef uint32_t pdsm_pa_e_type;
+
+typedef uint32_t pdsm_pa_cmd_cb_f_type;
 
 typedef struct registered_server_struct {
     /* MUST BE AT OFFSET ZERO!  The client code assumes this when it overwrites
@@ -121,6 +125,12 @@ typedef struct pdsm_delete_parms_type_struct
 	uint32_t val7;
 } pdsm_delete_parms_type;
 
+typedef struct pdsm_pa_info_type_struct
+{
+    pdsm_pa_e_type pa_set;
+	void *pa_ptr;
+} pdsm_pa_info_type;
+
 typedef struct pdsm_set_parameters_args_struct
 {
     pdsm_pa_cmd_cb_f_type pdsm_pa_cmd_cb_f_type;
@@ -130,11 +140,6 @@ typedef struct pdsm_set_parameters_args_struct
 	pdsm_client_id_type pdsm_client_id_type;
 } pdsm_set_parameters_args;
 
-typedef struct pdsm_pa_info_type_struct
-{
-    pdsm_pa_e_type pa_set;
-	void *pa_ptr;
-} pdsm_pa_info_type;
 
 typedef struct pdsm_xtra_time_info {
     uint32_t uncertainty;

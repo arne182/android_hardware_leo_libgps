@@ -1146,7 +1146,7 @@ void dispatch_pdsm_pd(uint32_t *data) {
     if(event&PDSM_PD_EVENT_DONE)
     {
         D("PDSM_PD_EVENT_DONE");
-        pdsm_pd_callback();
+        pdsm_pd_event_done_callback();
     }
 }
 

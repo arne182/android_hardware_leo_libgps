@@ -49,10 +49,61 @@
 #  define  D(...)   ((void)0)
 #endif
 
-typedef uint32_t pdsm_pa_e_type;
+typedef uint32_t pdsm_client_type_e;
 typedef int pdsm_client_id_type;
 
+typedef uint32_t pdsm_pa_e_type;
+
+typedef uint32_t pdsm_pa_nmea_port_e_type;
+typedef uint32_t pdsm_pa_nmea_reporting_e_type;
+
+typedef uint32_t pdsm_pd_session_e_type;
+typedef uint32_t pdsm_pd_session_operation_e_type;
+
+typedef uint32_t pdsm_server_option_e_type;
+typedef uint32_t pdsm_server_address_e_type;
+
+typedef uint32_t pdsm_sess_jgps_type_e_type;
+
+typedef uint32_t pdsm_pd_cmd_cb_f_type;
 typedef uint32_t pdsm_pa_cmd_cb_f_type;
+typedef uint32_t pdsm_xtra_cmd_cb_f_type;
+
+typedef uint32_t pdsm_xtra_dc_status_e_type;
+
+typedef uint32_t pdsm_pa_event_f_type;
+typedef uint32_t pdsm_client_event_reg_e_type;
+typedef uint32_t pdsm_pa_event_type;
+typedef uint32_t pdsm_pa_cmd_err_f_type;
+
+typedef uint32_t pdsm_pd_event_f_type;
+typedef uint32_t pdsm_pd_event_type;
+typedef uint32_t pdsm_pd_cmd_err_f_type;
+typedef uint32_t pdsm_pd_end_session_e_type;
+
+typedef uint32_t pdsm_xtra_event_f_type;
+typedef uint32_t pdsm_xtra_event_type;
+typedef uint32_t pdsm_xtra_cmd_err_f_type;
+
+typedef uint32_t pdsm_ext_status_event_f_type;
+typedef uint32_t pdsm_ext_status_event_type;
+typedef uint32_t pdsm_ext_status_cmd_err_f_type;
+
+typedef uint32_t pdsm_gps_lock_e_type;
+typedef uint32_t pdsm_position_mode_type;
+typedef uint32_t pdsm_pa_mt_lr_support_e_type;
+typedef uint32_t pdsm_pa_mo_method_e_type;
+typedef uint8_t pdsm_pa_nmea_type;
+typedef uint32_t pdsm_pa_sbas_status_e_type;
+
+typedef uint32_t pdsm_atl_type;
+typedef uint32_t pdsm_atl_open_f_type;
+typedef uint32_t pdsm_atl_close_f_type;
+typedef uint32_t pdsm_atl_dns_lookup_f_type;
+
+typedef uint32_t pdsm_lcs_event_f_type;
+typedef uint32_t pdsm_lcs_event_type;
+typedef uint32_t pdsm_lcs_cmd_err_f_type;
 
 typedef struct registered_server_struct {
     /* MUST BE AT OFFSET ZERO!  The client code assumes this when it overwrites

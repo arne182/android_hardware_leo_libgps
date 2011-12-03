@@ -73,8 +73,13 @@ static pthread_cond_t get_position_cond = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t get_pos_ready_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t get_pos_ready_cond = PTHREAD_COND_INITIALIZER;
 
+pthread_t gps_delete_aiding_data_delayed_thread;
+
 static int started = 0;
 static int active = 0;
+static int unable_to_delete = 0;
+static int xtra_data_inject_request = 0;
+static int gps_delete_aiding_data_delayed_status = 0;
 
 void update_gps_location(GpsLocation *location);
 void update_gps_status(GpsStatusValue value);
@@ -1311,7 +1316,21 @@ static int gps_inject_location(double latitude, double longitude, float accuracy
 static void gps_delete_aiding_data(GpsAidingData flags) {
     D("%s() is called", __FUNCTION__);
     D("flags=%d", flags);
-    /* not yet implemented */
+    if(unable_to_delete > 0 || xtra_data_inject_request > 0)
+	{
+		if (gps_delete_aiding_data_delayed_status < 1)
+		{
+			gps_delete_aiding_data_delayed_status = 1;
+			pthread_create(&gps_delete_aiding_data_delayed_thread, NULL, gps_delete_aiding_data_delayed, &flags);
+		}
+		else
+		{
+			return;
+		}
+		return;
+	}
+	
+	gps_delete_data(flags);
 }
 
 static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {

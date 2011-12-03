@@ -51,7 +51,6 @@
 
 typedef uint32_t pdsm_pa_e_type;
 typedef int pdsm_client_id_type;
-typedef uint32_t pdsm_pa_e_type;
 
 typedef uint32_t pdsm_pa_cmd_cb_f_type;
 

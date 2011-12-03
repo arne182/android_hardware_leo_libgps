@@ -65,7 +65,9 @@
 static void *gps_timer_thread( void*  arg );
 #endif
 
-static void *gps_get_position_thread( void*  arg );
+//static void *gps_get_position_thread( void*  arg );
+
+static pthread_t get_position_thread;
 
 static pthread_mutex_t get_position_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t get_position_cond = PTHREAD_COND_INITIALIZER;
@@ -1087,7 +1089,7 @@ void pdsm_pd_callback() {
     pthread_cond_signal(&get_pos_ready_cond);
 }
 
-static void* gps_get_position_thread( void*  arg ) {
+/*static void* gps_get_position_thread( void*  arg ) {
     D("%s() running", __FUNCTION__);
     GpsState*  s = _gps_state;
     while(active)
@@ -1105,7 +1107,7 @@ static void* gps_get_position_thread( void*  arg ) {
     }
     D("%s() destroyed", __FUNCTION__);
     return NULL;
-}
+}*/
 
 static void gps_state_init( GpsState*  state ) {
 

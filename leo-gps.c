@@ -794,7 +794,7 @@ static void* get_position_thread_method()
 {
 	while(active)
 	{
-		get_pos = started;
+		//get_pos = started;
 		while(get_pos)
 		{
 			if(gps_delete_aiding_data_delayed_status < 1)
@@ -817,6 +817,8 @@ static void* get_position_thread_method()
 
 static void gps_state_done( GpsState*  s ) {
 
+    get_pos = 0;
+    active = 0;
     update_gps_status(GPS_STATUS_ENGINE_OFF);
 
     // tell the thread to quit, and wait for it
@@ -845,6 +847,7 @@ static void gps_state_done( GpsState*  s ) {
 
 static void gps_state_start( GpsState*  s ) {
     // Navigation started.
+    get_pos = 1;
     update_gps_status(GPS_STATUS_SESSION_BEGIN);
 
     char  cmd = CMD_START;
@@ -860,6 +863,7 @@ static void gps_state_start( GpsState*  s ) {
 
 static void gps_state_stop( GpsState*  s ) {
     // Navigation ended.
+    get_pos = 0;
     update_gps_status(GPS_STATUS_SESSION_END);
 
     char  cmd = CMD_STOP;
@@ -1537,7 +1541,7 @@ static void* gps_delete_aiding_data_delayed(void * flags)
 	}
 	
 	gps_delete_aiding_data_delayed_status = 0;
-	get_pos = started;
+	//get_pos = started;
 	if (xtra_data_inject_request > 0)
 	{
 		pthread_cond_signal(&other_request_cond);

@@ -763,6 +763,17 @@ enum {
     CMD_STOP  = 2
 };
 
+void delete_params_complete() 
+{
+	pthread_cond_signal(&delete_params_cond);
+}
+
+void pdsm_pd_event_gps_done_callback() 
+{
+	unable_to_delete = 0;
+	pthread_cond_signal(&delete_delayed_cond);
+}
+
 void pdsm_pd_event_done_callback() 
 {
 	event_running = 0;

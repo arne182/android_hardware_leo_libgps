@@ -1162,16 +1162,16 @@ int gps_delete_data(uint32_t flags) {
 	return res;
 }
 
-int pdsm_set_parameters(uint32_t val0, uint32_t val1, uint32_t val2, pdsm_pa_info_type *pdsm_pa_info_type, int client) 
+int pdsm_set_parameters(struct CLIENT *clnt, int client, uint32_t val0, uint32_t val1, uint32_t val2, pdsm_pa_info_type *pdsm_pa_info_type) 
 {
-    uint32_t res = -1;
+        uint32_t res = -1;
 	pdsm_set_parameters_args pdsm_set_parameters_args;
 	pdsm_set_parameters_args.pdsm_pa_cmd_cb_f_type = val0;
 	pdsm_set_parameters_args.pdsm_set_parameters_args_client_data_ptr = val1;
 	pdsm_set_parameters_args.pdsm_pa_info_type = pdsm_pa_info_type;
 	pdsm_set_parameters_args.pdsm_pa_e_type = val2;
 	pdsm_set_parameters_args.pdsm_client_id_type = client_IDs[client];
-	if(clnt_call(_clnt, 0xF, xdr_rpc_pdsm_set_parameters_args, &pdsm_set_parameters_args, xdr_result_int, &res, timeout)) {
+	if(clnt_call(clnt, 0xF, xdr_rpc_pdsm_set_parameters_args, &pdsm_set_parameters_args, xdr_result_int, &res, timeout)) {
 		D("pdsm_set_parameters(%u, %u, %u, %d) failed\n", val0, val1, val2, client);
 		exit(-1);
 	}

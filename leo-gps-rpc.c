@@ -198,6 +198,13 @@ typedef struct pdsm_xtra_time_info {
     bool_t force_flag;
 } pdsm_xtra_time_info_type;
 
+typedef struct pdsm_pd_server_info_s_type_struct
+{
+	pdsm_server_option_e_type pdsm_server_option_e_type;
+	pdsm_server_address_s_type *pdsm_server_address_s_type;
+} pdsm_pd_server_info_s_type;
+
+
 struct xtra_time_params {
     uint32_t *data;
     pdsm_xtra_time_info_type *time_info_ptr;

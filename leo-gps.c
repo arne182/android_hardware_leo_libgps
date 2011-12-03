@@ -88,6 +88,7 @@ static pthread_mutex_t xtra_data_inject_request_mutex = PTHREAD_MUTEX_INITIALIZE
 static pthread_cond_t xtra_data_inject_request_cond = PTHREAD_COND_INITIALIZER;
 
 pthread_t gps_delete_aiding_data_delayed_thread;
+pthread_t gps_xtra_inject_xtra_data_delayed_thread;
 
 static int started = 0;
 static int active = 0;

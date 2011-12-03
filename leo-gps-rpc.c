@@ -1151,6 +1151,15 @@ void dispatch_pdsm_pd(uint32_t *data) {
     }
 }
 
+void dispatch_pdsm_pd_cmd(uint32_t *data) 
+{
+	uint32_t pd_cmd=ntohl(data[2]);
+	uint32_t pd_error=ntohl(data[3]);
+	
+	D("pd_cmd: %d", pd_cmd);
+	D("pd_error: %d", pd_error);
+}
+
 void dispatch_pdsm_ext(uint32_t *data) {
     GpsSvStatus ret;
     int i;

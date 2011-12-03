@@ -198,6 +198,12 @@ typedef struct pdsm_xtra_time_info {
     bool_t force_flag;
 } pdsm_xtra_time_info_type;
 
+typedef struct pdsm_server_address_s_type_struct
+{
+	pdsm_server_address_e_type pdsm_server_address_e_type;
+	pdsm_server_address_u_type *pdsm_server_address_u_type;
+} pdsm_server_address_s_type;
+
 typedef struct pdsm_pd_server_info_s_type_struct
 {
 	pdsm_server_option_e_type pdsm_server_option_e_type;
@@ -256,11 +262,6 @@ static bool_t xdr_rpc_pdsm_pa_mo_method_e_type(XDR *xdrs, pdsm_pa_mo_method_e_ty
 	return 1;
 }
 
-typedef struct pdsm_server_address_s_type_struct
-{
-	pdsm_server_address_e_type pdsm_server_address_e_type;
-	pdsm_server_address_u_type *pdsm_server_address_u_type;
-} pdsm_server_address_s_type;
 
 static bool_t xdr_rpc_pdsm_pd_server_address_s_type(XDR *xdrs, pdsm_server_address_s_type *pdsm_server_address_s_type)
 {

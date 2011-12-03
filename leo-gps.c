@@ -1184,6 +1184,89 @@ static int gps_xtra_init(GpsXtraCallbacks* callbacks) {
     return 0;
 }
 
+static void *gps_xtra_inject_xtra_data_delayed(void *input)
+{
+	D("%s() is called", __FUNCTION__);
+	xtra_inject_info *in;
+	char *data;
+	int length = 0;
+	int rpc_ret_val = -1;
+	int ret_val = -1;
+	unsigned char *xtra_data_ptr;
+	uint32_t  part_len;
+	uint8_t   part;
+	uint8_t   total_parts;
+	uint16_t  len_injected;
+	
+	in = (xtra_inject_info *)input;
+	data = in->data;
+	length = in->length;
+	
+	total_parts = (length / XTRA_BLOCK_SIZE);
+	if ((total_parts % XTRA_BLOCK_SIZE) != 0)
+	{
+		total_parts += 1;
+	}
+
+	len_injected = 0; // O bytes injected
+	xtra_data_ptr = data;
+	
+	if(gps_delete_aiding_data_delayed_status > 0)
+	{
+		pthread_mutex_lock(&other_request_mutex);
+		pthread_cond_wait(&other_request_cond, &other_request_mutex);
+		pthread_mutex_unlock(&other_request_mutex);
+	}
+	
+	if(event_running > 0)
+	{
+		exit_gps_rpc();
+		
+		pthread_mutex_lock(&xtra_data_inject_request_mutex);
+		pthread_cond_wait(&xtra_data_inject_request_cond, &xtra_data_inject_request_mutex);
+		pthread_mutex_unlock(&xtra_data_inject_request_mutex);
+	}
+	
+	// XTRA injection starts with part 1
+	for (part = 1; part <= total_parts; part++)
+	{
+		if ((length - len_injected) < XTRA_BLOCK_SIZE)
+		{
+			part_len = length - len_injected;
+		} else {
+			part_len = XTRA_BLOCK_SIZE;
+		}    
+		
+		D("gps_xtra_inject_xtra_data: inject part = %d/%d, len = %d\n", part, total_parts, part_len);
+		rpc_ret_val = gps_xtra_set_data(xtra_data_ptr, part_len, part, total_parts);
+		if (rpc_ret_val == -1)
+		{
+			D("gps_xtra_set_data() for xtra returned %d \n", rpc_ret_val);
+			ret_val = EINVAL; // return error
+			break;
+		}
+		
+		xtra_data_ptr += part_len;
+		len_injected += part_len;
+	}
+	
+	xtra_data_inject_request = 0;
+	
+	if (gps_delete_aiding_data_delayed_status > 0)
+	{
+		pthread_cond_signal(&other_request_cond);
+	}
+	else if (get_pos > 0)
+	{
+		pdsm_pd_event_done_callback();
+	}
+	
+	free(in->data);
+	free(in);
+
+	return NULL;
+}
+
 static int gps_xtra_inject_xtra_data(char* data, int length) {
     D("%s() is called", __FUNCTION__);
     D("gps_xtra_inject_xtra_data: xtra size = %d, data ptr = 0x%x\n", length, (int) data);

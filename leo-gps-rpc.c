@@ -222,6 +222,49 @@ struct xtra_auto_params {
     uint16_t interval;
 };
 
+static bool_t xdr_rpc_pdsm_pa_nmea_type(XDR *xdrs, pdsm_pa_nmea_type *pdsm_pa_nmea_type)
+{
+	if (!xdr_u_char(xdrs, pdsm_pa_nmea_type))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_pa_mo_method_e_type(XDR *xdrs, pdsm_pa_mo_method_e_type *pdsm_pa_mo_method_e_type)
+{
+	if (!xdr_u_long(xdrs, pdsm_pa_mo_method_e_type))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_pd_server_address_s_type(XDR *xdrs, pdsm_server_address_s_type *pdsm_server_address_s_type)
+{
+	if(!xdr_u_long(xdrs, &pdsm_server_address_s_type->pdsm_server_address_e_type))
+		return 0;
+	if(!xdr_rpc_pdsm_pd_server_address_u_type(xdrs, pdsm_server_address_s_type->pdsm_server_address_u_type))
+		return 0;
+	
+	return 1;
+}
+
+
+static bool_t xdr_rpc_pdsm_pa_mt_lr_support_e_type(XDR *xdrs, pdsm_pa_mt_lr_support_e_type *pdsm_pa_mt_lr_support_e_type)
+{
+	if (!xdr_u_long(xdrs, pdsm_pa_mt_lr_support_e_type))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_position_mode_type(XDR *xdrs, pdsm_position_mode_type *pdsm_position_mode_type)
+{
+	if (!xdr_u_long(xdrs, pdsm_position_mode_type))
+		return 0;
+	
+	return 1;
+}
+
 static bool_t xdr_rpc_pdsm_pa_info(XDR *xdrs, pdsm_pa_info_type *pdsm_pa_info_type)
 {
 	if (!xdr_u_long(xdrs, &pdsm_pa_info_type->pa_set))
@@ -323,47 +366,7 @@ static bool_t xdr_rpc_pdsm_pa_info(XDR *xdrs, pdsm_pa_info_type *pdsm_pa_info_ty
 	return 1;
 }
 
-static bool_t xdr_rpc_pdsm_pd_server_address_s_type(XDR *xdrs, pdsm_server_address_s_type *pdsm_server_address_s_type)
-{
-	if(!xdr_u_long(xdrs, &pdsm_server_address_s_type->pdsm_server_address_e_type))
-		return 0;
-	if(!xdr_rpc_pdsm_pd_server_address_u_type(xdrs, pdsm_server_address_s_type->pdsm_server_address_u_type))
-		return 0;
-	
-	return 1;
-}
 
-static bool_t xdr_rpc_pdsm_pa_nmea_type(XDR *xdrs, pdsm_pa_nmea_type *pdsm_pa_nmea_type)
-{
-	if (!xdr_u_char(xdrs, pdsm_pa_nmea_type))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_pa_mo_method_e_type(XDR *xdrs, pdsm_pa_mo_method_e_type *pdsm_pa_mo_method_e_type)
-{
-	if (!xdr_u_long(xdrs, pdsm_pa_mo_method_e_type))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_pa_mt_lr_support_e_type(XDR *xdrs, pdsm_pa_mt_lr_support_e_type *pdsm_pa_mt_lr_support_e_type)
-{
-	if (!xdr_u_long(xdrs, pdsm_pa_mt_lr_support_e_type))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_position_mode_type(XDR *xdrs, pdsm_position_mode_type *pdsm_position_mode_type)
-{
-	if (!xdr_u_long(xdrs, pdsm_position_mode_type))
-		return 0;
-	
-	return 1;
-}
 
 static bool_t xdr_rpc_pdsm_delete_params_type(XDR *xdrs, pdsm_delete_parms_type *pdsm_delete_parms_type)
 {

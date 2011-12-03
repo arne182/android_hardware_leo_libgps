@@ -168,11 +168,6 @@ typedef struct pdsm_pd_sec_update_rate_s_type_struct
 	uint8_t val0;
 } pdsm_pd_sec_update_rate_s_type;
 
-typedef struct pdsm_pd_sec_update_rate_s_type_struct
-{
-	uint8_t val0;
-} pdsm_pd_sec_update_rate_s_type;
-
 typedef struct pdsm_pa_nmea_config_s_type_struct
 {
 	pdsm_pa_nmea_port_e_type pdsm_pa_nmea_port_e_type;

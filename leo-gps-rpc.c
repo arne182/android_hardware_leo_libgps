@@ -209,6 +209,24 @@ typedef struct pdsm_xtra_time_info {
     bool_t force_flag;
 } pdsm_xtra_time_info_type;
 
+typedef struct pdsm_server_ipv4_address_type_struct
+{
+	uint32_t val0;
+	uint32_t val1;
+} pdsm_server_ipv4_address_type;
+
+typedef struct pdsm_server_ipv6_address_type_struct
+{
+	uint32_t val1;
+	//missing array needs work
+} pdsm_server_ipv6_address_type;
+
+typedef struct pdsm_server_url_address_type_struct
+{
+	uint8_t val0;
+	char *byte_array;
+} pdsm_server_url_address_type;
+
 typedef struct pdsm_server_address_u_type_struct
 {
 	pdsm_server_address_e_type pdsm_server_address_e_type;

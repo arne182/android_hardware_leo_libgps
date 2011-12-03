@@ -1411,12 +1411,11 @@ static void* gps_delete_aiding_data_delayed(void * flags)
 	}
 	
 	gps_delete_aiding_data_delayed_status = 0;
-	
+	get_pos = started;
 	if (xtra_data_inject_request > 0)
 	{
 		pthread_cond_signal(&other_request_cond);
 	}
-	get_pos = started;
 	else if (get_pos > 0)
 	{
 		pdsm_pd_event_done_callback();

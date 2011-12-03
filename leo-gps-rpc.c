@@ -1383,7 +1383,7 @@ int init_leo()
             gps_xtra_set_auto_params();
         CHECKED[0] = 1;
     }
-
+    gps_set_gps_lock(0);
     return 0;
 }
 
@@ -1431,6 +1431,17 @@ int gps_xtra_inject_time_info(GpsUtcTime time, int64_t timeReference, int uncert
     time_info_ptr.force_flag = 1;
     res = pdsm_xtra_inject_time_info(_clnt, 0, client_IDs[0xb], 0, &time_info_ptr);
     return res;
+}
+
+int gps_set_gps_lock(pdsm_gps_lock_e_type pdsm_gps_lock_e_type)
+{
+	uint32_t res = -1;
+	pdsm_pa_info_type pdsm_pa_info_type;
+	pdsm_pa_info_type.pa_set = 2;
+	pdsm_pa_info_type.pa_ptr = &pdsm_gps_lock_e_type;
+	
+	res = pdsm_set_parameters(_clnt,0x1,0, 0, 1, &pdsm_pa_info_type);
+	return res;
 }
 
 void gps_get_position() 

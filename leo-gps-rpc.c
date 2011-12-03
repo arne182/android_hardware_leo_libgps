@@ -171,6 +171,107 @@ struct xtra_auto_params {
     uint16_t interval;
 };
 
+static bool_t xdr_rpc_pdsm_pa_info(XDR *xdrs, pdsm_pa_info_type *pdsm_pa_info_type)
+{
+	if (!xdr_u_long(xdrs, &pdsm_pa_info_type->pa_set))
+		return 0;
+	switch(pdsm_pa_info_type->pa_set)
+	{
+		case 1:
+			//xdr_rpc_pdsm_pm_jgpsone_app_s_type needs implementing
+			return 0;
+			break;
+		case 2:
+			if(!xdr_rpc_pdsm_gps_lock_e_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 3:
+			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 4:
+			if(!xdr_rpc_pdsm_delete_params_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 5:
+			if(!xdr_rpc_pdsm_position_mode_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 6:
+			if(!xdr_rpc_pdsm_pa_mt_lr_support_e_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 7:
+			if(!xdr_rpc_pdsm_pa_mo_method_e_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 8:
+			if(!xdr_rpc_pdsm_pa_nmea_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 9:
+			if(!xdr_rpc_pdsm_pd_server_address_s_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 10:
+			if(!xdr_rpc_pdsm_pd_server_address_s_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 11:
+			if(!xdr_rpc_pdsm_pd_server_address_s_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 12:
+			//xdr_rpc_pdsm_pd_ssd_s_type needs implementing
+			return 0;
+			break;
+		case 13:
+			if(!xdr_rpc_pdsm_pd_sec_update_rate_s_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 14:
+			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 15:
+			if(!xdr_rpc_pdsm_pa_nmea_config_s_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 16:
+			//xdr_rpc_pdsm_efs_data_s_type needs implementing
+			return 0;
+			break;
+		case 17:
+			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 18:
+			if(!xdr_rpc_pdsm_pa_sbas_status_e_type(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 19:
+			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 20:
+			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 21:
+			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		case 22:
+			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
+				return 0;
+			break;
+		default:
+			return 0;
+	}
+	
+	return 1;
+}
+
 static bool_t xdr_rpc_pdsm_set_parameters_args(XDR *xdrs, pdsm_set_parameters_args *pdsm_set_parameters_args) 
 {    
 	if (!xdr_u_long(xdrs, &pdsm_set_parameters_args->pdsm_pa_cmd_cb_f_type))

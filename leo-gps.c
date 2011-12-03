@@ -73,10 +73,24 @@ static pthread_cond_t get_position_cond = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t get_pos_ready_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t get_pos_ready_cond = PTHREAD_COND_INITIALIZER;
 
+static pthread_mutex_t other_request_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t other_request_cond = PTHREAD_COND_INITIALIZER;
+
+static pthread_mutex_t delete_delayed_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t delete_delayed_cond = PTHREAD_COND_INITIALIZER;
+
+static pthread_mutex_t delete_params_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t delete_params_cond = PTHREAD_COND_INITIALIZER;
+
+static pthread_mutex_t xtra_data_inject_request_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t xtra_data_inject_request_cond = PTHREAD_COND_INITIALIZER;
+
 pthread_t gps_delete_aiding_data_delayed_thread;
 
 static int started = 0;
 static int active = 0;
+static int clients_active = 0;
+static int event_running = 0;
 static int unable_to_delete = 0;
 static int xtra_data_inject_request = 0;
 static int gps_delete_aiding_data_delayed_status = 0;
@@ -740,6 +754,20 @@ enum {
     CMD_STOP  = 2
 };
 
+void pdsm_pd_event_done_callback() 
+{
+	event_running = 0;
+	if (xtra_data_inject_request > 0)
+	{
+		pthread_cond_signal(&xtra_data_inject_request_cond);
+	}
+	else
+	{
+		
+		pthread_cond_signal(&get_pos_ready_cond);
+	}
+}
+
 static void gps_state_done( GpsState*  s ) {
 
     update_gps_status(GPS_STATUS_ENGINE_OFF);
@@ -1311,6 +1339,52 @@ static int gps_inject_location(double latitude, double longitude, float accuracy
     D("latitude=%f, longitude=%f, accuracy=%f", latitude, longitude, accuracy);
     /* not yet implemented */
     return 0;
+}
+
+static void* gps_delete_aiding_data_delayed(void * flags)
+{
+	uint32_t *flags_in = (uint32_t *)flags;
+	
+	if (xtra_data_inject_request > 0)
+	{
+		pthread_mutex_lock(&other_request_mutex);
+		pthread_cond_wait(&other_request_cond, &other_request_mutex);
+		pthread_mutex_unlock(&other_request_mutex);
+	}
+	
+	if (event_running > 0) 
+	{
+		exit_gps_rpc();
+	}
+	
+	if(unable_to_delete > 0)
+	{
+		pthread_mutex_lock(&delete_delayed_mutex);
+		pthread_cond_wait(&delete_delayed_cond, &delete_delayed_mutex);
+		pthread_mutex_unlock(&delete_delayed_mutex);
+	}
+	
+	if(clients_active)
+	{
+		gps_delete_data(*flags_in);
+		
+		pthread_mutex_lock(&delete_params_mutex);
+		pthread_cond_wait(&delete_params_cond, &delete_params_mutex);
+		pthread_mutex_unlock(&delete_params_mutex);
+	}
+	
+	gps_delete_aiding_data_delayed_status = 0;
+	
+	if (xtra_data_inject_request > 0)
+	{
+		pthread_cond_signal(&other_request_cond);
+	}
+	else if (get_pos > 0)
+	{
+		pdsm_pd_event_done_callback();
+	}
+	
+	return NULL;
 }
 
 static void gps_delete_aiding_data(GpsAidingData flags) {

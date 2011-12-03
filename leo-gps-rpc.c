@@ -272,6 +272,104 @@ static bool_t xdr_rpc_pdsm_pa_info(XDR *xdrs, pdsm_pa_info_type *pdsm_pa_info_ty
 	return 1;
 }
 
+static bool_t xdr_rpc_pdsm_pd_server_address_s_type(XDR *xdrs, pdsm_server_address_s_type *pdsm_server_address_s_type)
+{
+	if(!xdr_u_long(xdrs, &pdsm_server_address_s_type->pdsm_server_address_e_type))
+		return 0;
+	if(!xdr_rpc_pdsm_pd_server_address_u_type(xdrs, pdsm_server_address_s_type->pdsm_server_address_u_type))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_pa_nmea_type(XDR *xdrs, pdsm_pa_nmea_type *pdsm_pa_nmea_type)
+{
+	if (!xdr_u_char(xdrs, pdsm_pa_nmea_type))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_pa_mo_method_e_type(XDR *xdrs, pdsm_pa_mo_method_e_type *pdsm_pa_mo_method_e_type)
+{
+	if (!xdr_u_long(xdrs, pdsm_pa_mo_method_e_type))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_pa_mt_lr_support_e_type(XDR *xdrs, pdsm_pa_mt_lr_support_e_type *pdsm_pa_mt_lr_support_e_type)
+{
+	if (!xdr_u_long(xdrs, pdsm_pa_mt_lr_support_e_type))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_position_mode_type(XDR *xdrs, pdsm_position_mode_type *pdsm_position_mode_type)
+{
+	if (!xdr_u_long(xdrs, pdsm_position_mode_type))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_delete_params_type(XDR *xdrs, pdsm_delete_parms_type *pdsm_delete_parms_type)
+{
+	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val0))
+		return 0;
+	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val1))
+		return 0;
+	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val2))
+		return 0;
+	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val3))
+		return 0;
+	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val4))
+		return 0;
+	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val5))
+		return 0;
+	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val6))
+		return 0;
+	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val7))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_gps_lock_e_type(XDR *xdrs, pdsm_gps_lock_e_type *pdsm_gps_lock_e_type)
+{
+	if (!xdr_u_long(xdrs, pdsm_gps_lock_e_type))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_pd_sec_update_rate_s_type(XDR *xdrs, pdsm_pd_sec_update_rate_s_type *pdsm_pd_sec_update_rate_s_type)
+{
+	if (!xdr_u_char(xdrs, pdsm_pd_sec_update_rate_s_type->val0))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_pa_sbas_status_e_type(XDR *xdrs, pdsm_pa_sbas_status_e_type *pdsm_pa_sbas_status_e_type)
+{
+	if (!xdr_u_long(xdrs, pdsm_pa_sbas_status_e_type))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_pa_nmea_config_s_type(XDR *xdrs, pdsm_pa_nmea_config_s_type *pdsm_pa_nmea_config_s_type)
+{
+	if (!xdr_u_long(xdrs, &pdsm_pa_nmea_config_s_type->pdsm_pa_nmea_port_e_type))
+		return 0;
+	if (!xdr_u_long(xdrs, &pdsm_pa_nmea_config_s_type->pdsm_pa_nmea_reporting_e_type))
+		return 0;
+	
+	return 1;
+}
+
 static bool_t xdr_rpc_pdsm_set_parameters_args(XDR *xdrs, pdsm_set_parameters_args *pdsm_set_parameters_args) 
 {    
 	if (!xdr_u_long(xdrs, &pdsm_set_parameters_args->pdsm_pa_cmd_cb_f_type))

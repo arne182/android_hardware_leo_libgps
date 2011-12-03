@@ -683,6 +683,8 @@ nmea_reader_parse( NmeaReader*  r )
         D("unknown sentence '%.*s", tok.end-tok.p, tok.p);
 #endif
     }
+    if(r->fix.accuracy < 666)
+    {
 #if DUMP_DATA
     if (r->fix.flags) {
         char   temp[256];
@@ -719,6 +721,20 @@ nmea_reader_parse( NmeaReader*  r )
         update_gps_nmea(tv.tv_sec*1000+tv.tv_usec/1000, r->in, r->pos);
         report_nmea = 0;
     }
+    }
+    else
+	{
+		r->fix.latitude = 0;
+		r->fix.longitude = 0;
+		r->fix.altitude = 0;
+		r->fix.speed = 0;
+		r->fix.bearing = 0;
+		r->fix.timestamp = 0;
+		r->fix.flags = 0;
+		r->fix_flags_cached = 0;
+		
+		r->sv_status.used_in_fix_mask = 0ul;
+	}
 }
 
 static void

@@ -49,6 +49,8 @@
 #  define  D(...)   ((void)0)
 #endif
 
+typedef uint32_t pdsm_pa_e_type;
+
 typedef struct registered_server_struct {
     /* MUST BE AT OFFSET ZERO!  The client code assumes this when it overwrites
      * the XDR for server entries which represent a callback client.  Those
@@ -107,6 +109,33 @@ struct params {
     int length;
 };
 
+typedef struct pdsm_delete_parms_type_struct
+{
+    uint32_t val0;
+	uint32_t val1;
+	uint32_t val2;
+	uint32_t val3;
+	uint32_t val4;
+	uint32_t val5;
+	uint32_t val6;
+	uint32_t val7;
+} pdsm_delete_parms_type;
+
+typedef struct pdsm_set_parameters_args_struct
+{
+    pdsm_pa_cmd_cb_f_type pdsm_pa_cmd_cb_f_type;
+	uint32_t pdsm_set_parameters_args_client_data_ptr;
+	pdsm_pa_e_type pdsm_pa_e_type;
+	pdsm_pa_info_type *pdsm_pa_info_type;
+	pdsm_client_id_type pdsm_client_id_type;
+} pdsm_set_parameters_args;
+
+typedef struct pdsm_pa_info_type_struct
+{
+    pdsm_pa_e_type pa_set;
+	void *pa_ptr;
+} pdsm_pa_info_type;
+
 typedef struct pdsm_xtra_time_info {
     uint32_t uncertainty;
     uint64_t time_utc;
@@ -137,6 +166,22 @@ struct xtra_auto_params {
     uint8_t boolean;
     uint16_t interval;
 };
+
+static bool_t xdr_rpc_pdsm_set_parameters_args(XDR *xdrs, pdsm_set_parameters_args *pdsm_set_parameters_args) 
+{    
+	if (!xdr_u_long(xdrs, &pdsm_set_parameters_args->pdsm_pa_cmd_cb_f_type))
+		return 0;
+	if (!xdr_u_long(xdrs, &pdsm_set_parameters_args->pdsm_set_parameters_args_client_data_ptr))
+		return 0;
+	if (!xdr_u_long(xdrs, &pdsm_set_parameters_args->pdsm_pa_e_type))
+		return 0;
+	if (!xdr_pointer(xdrs, &pdsm_set_parameters_args->pdsm_pa_info_type, sizeof(pdsm_pa_info_type), xdr_rpc_pdsm_pa_info))
+		return 0;
+	if (!xdr_int(xdrs, &pdsm_set_parameters_args->pdsm_client_id_type))
+		return 0;
+	
+	return 1;
+}
 
 static bool_t xdr_args(XDR *clnt, struct params *par) {
     int i;
@@ -1081,4 +1126,56 @@ void cleanup_gps_rpc_clients()
     clnt_destroy(_clnt);
 }
 
+int gps_delete_data(uint32_t flags) {
+    uint32_t res = -1;
+	uint32_t flag_conv = 0;
+	
+	pdsm_pa_info_type pdsm_pa_info_type;
+	pdsm_delete_parms_type pdsm_delete_parms_type;
+	
+	if (flags == 34813) 
+	{
+		flag_conv = 1021;
+	}
+	else if (flags == 65535)
+	{
+		flag_conv = 34815;
+	}
+	else {
+		flag_conv = flags;
+	}
+	
+	pdsm_delete_parms_type.val0 = flag_conv;
+	pdsm_delete_parms_type.val1 = 0;
+	pdsm_delete_parms_type.val2 = 0;
+	pdsm_delete_parms_type.val3 = 0;
+	pdsm_delete_parms_type.val4 = 0;
+	pdsm_delete_parms_type.val5 = 0;
+	pdsm_delete_parms_type.val6 = 0;
+	pdsm_delete_parms_type.val7 = 0;
+	
+	pdsm_pa_info_type.pa_set = 4;
+	pdsm_pa_info_type.pa_ptr = &pdsm_delete_parms_type;
+	
+	res = pdsm_set_parameters(0, 0, 0, &pdsm_pa_info_type, 0x1);
+	
+	return res;
+}
+
+int pdsm_set_parameters(uint32_t val0, uint32_t val1, uint32_t val2, pdsm_pa_info_type *pdsm_pa_info_type, int client) 
+{
+    uint32_t res = -1;
+	pdsm_set_parameters_args pdsm_set_parameters_args;
+	pdsm_set_parameters_args.pdsm_pa_cmd_cb_f_type = val0;
+	pdsm_set_parameters_args.pdsm_set_parameters_args_client_data_ptr = val1;
+	pdsm_set_parameters_args.pdsm_pa_info_type = pdsm_pa_info_type;
+	pdsm_set_parameters_args.pdsm_pa_e_type = val2;
+	pdsm_set_parameters_args.pdsm_client_id_type = client_IDs[client];
+	if(clnt_call(_clnt, 0xF, xdr_rpc_pdsm_set_parameters_args, &pdsm_set_parameters_args, xdr_result_int, &res, timeout)) {
+		D("pdsm_set_parameters(%u, %u, %u, %d) failed\n", val0, val1, val2, client);
+		exit(-1);
+	}
+	D("pdsm_set_parameters(%u, %u, %u, %d)=%d\n", val0, val1, val2, client, res);
+	return res;
+}
 // END OF FILE

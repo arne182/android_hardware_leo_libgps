@@ -106,6 +106,11 @@ void update_gps_nmea(GpsUtcTime timestamp, const char* nmea, int length);
 extern uint8_t get_cleanup_value();
 extern uint8_t get_precision_value();
 
+typedef struct xtra_inject_info_struct
+{
+	char *data;
+	int length;
+} xtra_inject_info;
 
 /*****************************************************************/
 /*****************************************************************/

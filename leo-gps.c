@@ -472,10 +472,15 @@ nmea_reader_update_accuracy( NmeaReader*  r,
 
     if (tok.p >= tok.end)
         return -1;
-
+    D("accuracy: %f", r->fix.accuracy);
     r->fix.flags   |= GPS_LOCATION_HAS_ACCURACY;
     float precision = (float)get_precision_value();
-    r->fix.accuracy = (float)str2float(tok.p, tok.end) * precision;
+    if(r->fix.accuracy < 666)
+    {
+    	D("Less Than 666");
+    	r->fix.accuracy = (float)str2float(tok.p, tok.end) * precision;
+    }
+    
     return 0;
 }
 

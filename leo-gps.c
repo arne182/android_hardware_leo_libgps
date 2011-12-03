@@ -91,7 +91,7 @@ pthread_t gps_delete_aiding_data_delayed_thread;
 
 static int started = 0;
 static int active = 0;
-static int get_pos = 0;
+static int& get_pos = started;
 static int clients_active = 0;
 static int event_running = 0;
 static int unable_to_delete = 0;

@@ -238,11 +238,27 @@ static bool_t xdr_rpc_pdsm_pa_mo_method_e_type(XDR *xdrs, pdsm_pa_mo_method_e_ty
 	return 1;
 }
 
+typedef struct pdsm_server_address_s_type_struct
+{
+	pdsm_server_address_e_type pdsm_server_address_e_type;
+	pdsm_server_address_u_type *pdsm_server_address_u_type;
+} pdsm_server_address_s_type;
+
 static bool_t xdr_rpc_pdsm_pd_server_address_s_type(XDR *xdrs, pdsm_server_address_s_type *pdsm_server_address_s_type)
 {
 	if(!xdr_u_long(xdrs, &pdsm_server_address_s_type->pdsm_server_address_e_type))
 		return 0;
 	if(!xdr_rpc_pdsm_pd_server_address_u_type(xdrs, pdsm_server_address_s_type->pdsm_server_address_u_type))
+		return 0;
+	
+	return 1;
+}
+
+static bool_t xdr_rpc_pdsm_pd_server_info_s_type(XDR *xdrs, pdsm_pd_server_info_s_type *pdsm_pd_server_info_s_type)
+{
+	if(!xdr_u_long(xdrs, &pdsm_pd_server_info_s_type->pdsm_server_option_e_type))
+		return 0;
+	if(!xdr_rpc_pdsm_pd_server_address_s_type(xdrs, pdsm_pd_server_info_s_type->pdsm_server_address_s_type))
 		return 0;
 	
 	return 1;

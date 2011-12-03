@@ -1171,7 +1171,11 @@ int pdsm_set_parameters(struct CLIENT *clnt, int client, uint32_t val0, uint32_t
 	pdsm_set_parameters_args.pdsm_pa_info_type = pdsm_pa_info_type;
 	pdsm_set_parameters_args.pdsm_pa_e_type = val2;
 	pdsm_set_parameters_args.pdsm_client_id_type = client_IDs[client];
-	if(clnt_call(clnt, 0xF, xdr_rpc_pdsm_set_parameters_args, &pdsm_set_parameters_args, xdr_result_int, &res, timeout)) {
+	if(clnt_call(clnt, 0xF, 
+	    (xdrproc_t)xdr_rpc_pdsm_set_parameters_args, 
+	    (caddr_t)&pdsm_set_parameters_args, 
+	    (xdrproc_t)xdr_result_int, 
+	    (caddr_t)&res, timeout)) {
 		D("pdsm_set_parameters(%u, %u, %u, %d) failed\n", val0, val1, val2, client);
 		exit(-1);
 	}

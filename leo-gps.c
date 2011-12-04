@@ -333,7 +333,7 @@ nmea_reader_update_time( NmeaReader*  r, Token  tok )
     double     seconds;
     struct tm  tm;
     time_t     fix_time;
-
+    time_t secondsnow;
     if (tok.p + 6 > tok.end)
         return -1;
 
@@ -352,7 +352,7 @@ nmea_reader_update_time( NmeaReader*  r, Token  tok )
 
     tm.tm_hour  = hour;
     tm.tm_min   = minute;
-    D("fix_time seconds difference=%d", tm.tm_sec- (int)seconds); // UTC time + utc_diff
+
     tm.tm_sec   = (int) seconds;
     tm.tm_year  = r->utc_year - 1900;
     tm.tm_mon   = r->utc_mon - 1;
@@ -360,7 +360,8 @@ nmea_reader_update_time( NmeaReader*  r, Token  tok )
     tm.tm_isdst = 0;
 
     fix_time = mktime( &tm ) + r->utc_diff;
-
+    seconds = time (NULL);
+    D("fix_time seconds difference=%d", fix_time - secondsnow); // UTC time + utc_diff    
 #if DUMP_DATA
     D("fix_time=%d", fix_time); // UTC time + utc_diff
 #endif

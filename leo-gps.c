@@ -360,7 +360,7 @@ nmea_reader_update_time( NmeaReader*  r, Token  tok )
     tm.tm_isdst = 0;
 
     fix_time = mktime( &tm ) + r->utc_diff;
-    seconds = time (NULL);
+    secondsnow = time (NULL);
     D("fix_time seconds difference=%d", fix_time - secondsnow); // UTC time + utc_diff    
 #if DUMP_DATA
     D("fix_time=%d", fix_time); // UTC time + utc_diff

@@ -1649,4 +1649,9 @@ const GpsInterface* gps_get_hardware_interface()
     return &hardwareGpsInterface;
 }
 
+void set_clients_active(int active)
+{
+	clients_active = active;
+}
+
 // END OF FILE

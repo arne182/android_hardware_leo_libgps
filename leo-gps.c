@@ -1166,7 +1166,7 @@ void pass_nmea(GpsState*  s, char *sentence, int length)
 	sem_wait(&s->fix_sem);
 	if (length > 0) {
 		for (nn = 0; nn < length; nn++) {
-			nmea_reader_addc(&reader, sentence[nn]);
+			nmea_reader_addc(&s->reader, sentence[nn]);
 		}
 	}
 	sem_post(&s->fix_sem);

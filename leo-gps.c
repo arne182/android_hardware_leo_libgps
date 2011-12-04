@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
-#include <ctime>
+
 #include <errno.h>
 #include <semaphore.h>
 #include <pthread.h>
@@ -361,7 +361,7 @@ nmea_reader_update_time( NmeaReader*  r, Token  tok )
 
     fix_time = mktime( &tm ) + r->utc_diff;
     secondsnow = time (NULL);
-    timeval tim;
+    struct timeval tim;
     gettimeofday(&tim, NULL);
     double t1=tim.tv_sec+(tim.tv_usec/1000000.0);
     double t2= tim.tv_sec*1000+(tim.tv_usec/100.0);

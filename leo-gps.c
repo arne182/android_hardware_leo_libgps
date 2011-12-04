@@ -1156,6 +1156,22 @@ void pdsm_pd_callback() {
     return NULL;
 }*/
 
+
+
+
+void pass_nmea(GpsState*  s, char *sentence, int length)
+{
+	int nn;
+	
+	sem_wait(&s->fix_sem);
+	if (length > 0) {
+		for (nn = 0; nn < length; nn++) {
+			nmea_reader_addc(&reader, sentence[nn]);
+		}
+	}
+	sem_post(&s->fix_sem);
+}
+
 static void gps_state_init( GpsState*  state ) {
 
     

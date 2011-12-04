@@ -361,13 +361,18 @@ nmea_reader_update_time( NmeaReader*  r, Token  tok )
 
     fix_time = mktime( &tm ) + r->utc_diff;
     secondsnow = time (NULL);
-    D("fix_time seconds difference=%d", fix_time - secondsnow); // UTC time + utc_diff    
+    timeval tim;
+    gettimeofday(&tim, NULL);
+    double t1=tim.tv_sec+(tim.tv_usec/1000000.0);
+    double t2= tim.tv_sec*1000+(tim.tv_usec/100.0);
+    D("fix_time seconds difference=%d", fix_time - t1); // UTC time + utc_diff    
 #if DUMP_DATA
     D("fix_time=%d", fix_time); // UTC time + utc_diff
 #endif
 
     r->fix.timestamp = (long long)fix_time * 1000 + (int)((seconds)*1000)%1000;
     D("milliseonds added=%d", (int)((seconds)*1000)%1000);
+    D("milliseonds really=%d", (tim.tv_usec/100.0));
     D("fix.timestamp=%ld", r->fix.timestamp);
     return 0;
 }

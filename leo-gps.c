@@ -93,6 +93,7 @@ pthread_t gps_xtra_inject_xtra_data_delayed_thread;
 static int started = 0;
 static float DOP = 0;
 static int active = 0;
+static int millisecondsdelay = 0;
 static int get_pos = 0;
 static int clients_active = 0;
 static int event_running = 0;
@@ -369,10 +370,10 @@ nmea_reader_update_time( NmeaReader*  r, Token  tok )
 #if DUMP_DATA
     D("fix_time=%d", fix_time); // UTC time + utc_diff
 #endif
-    D("milliseonds really=%d", t2-r->fix.timestamp*1000);
+    D("milliseconds really=%f", t2-r->fix_time*1000);
     r->fix.timestamp = (long long)fix_time * 1000 + (int)((seconds)*1000)%1000;
-    D("milliseonds added=%d", (int)((seconds)*1000)%1000);
-
+    D("milliseconds added=%f", (int)((seconds)*1000)%1000);
+    D("milliseconds really after=%f", t2-r->fix.timestamp);
     D("fix.timestamp=%ld", r->fix.timestamp);
     return 0;
 }

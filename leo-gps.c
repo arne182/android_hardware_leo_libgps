@@ -352,6 +352,7 @@ nmea_reader_update_time( NmeaReader*  r, Token  tok )
 
     tm.tm_hour  = hour;
     tm.tm_min   = minute;
+    D("fix_time seconds difference=%d", tm.tm_sec- (int)seconds); // UTC time + utc_diff
     tm.tm_sec   = (int) seconds;
     tm.tm_year  = r->utc_year - 1900;
     tm.tm_mon   = r->utc_mon - 1;

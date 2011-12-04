@@ -898,12 +898,37 @@ static void gps_state_done( GpsState*  s ) {
 	sem_destroy(&s->fix_sem);
 	
 	update_gps_status(GPS_STATUS_ENGINE_OFF);
+	    // tell the thread to quit, and wait for it
+    char   cmd = CMD_QUIT;
+    int    ret;
+    void*  dummy;
+
+    do { ret=write( s->control[0], &cmd, 1 ); }
+    while (ret < 0 && errno == EINTR);
+    // close the control socket pair
+    close( s->control[0] ); s->control[0] = -1;
+    close( s->control[1] ); s->control[1] = -1;
+
+    pthread_join(s->thread, &dummy);
+    pthread_join(s->pos_thread, &dummy);
+    
+    // close connection to the GPS daemon
+    close( s->fd ); s->fd = -1;
 }
 
 static void gps_state_start( GpsState*  s ) {
 	
 	get_pos = 1;
 	pthread_cond_signal(&get_position_cond);
+    char  cmd = CMD_START;
+    int   ret;
+
+    do { ret=write( s->control[0], &cmd, 1 ); }
+    while (ret < 0 && errno == EINTR);
+
+    if (ret != 1)
+        D("%s: could not send CMD_START command: ret=%d: %s",
+        __FUNCTION__, ret, strerror(errno));
 	
 	// Navigation started.
 	update_gps_status(GPS_STATUS_SESSION_BEGIN);
@@ -919,6 +944,14 @@ static void gps_state_stop( GpsState*  s ) {
 	
 	// Navigation ended.
 	update_gps_status(GPS_STATUS_SESSION_END);
+    char  cmd = CMD_STOP;
+    int   ret;
+
+    do { ret=write( s->control[0], &cmd, 1 ); }
+    while (ret < 0 && errno == EINTR);
+    if (ret != 1)
+        D("%s: could not send CMD_STOP command: ret=%d: %s",
+        __FUNCTION__, ret, strerror(errno));
 	
 }
 /*

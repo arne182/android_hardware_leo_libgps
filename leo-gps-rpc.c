@@ -1444,6 +1444,7 @@ int init_leo()
             gps_xtra_set_auto_params();
         CHECKED[0] = 1;
     }
+    set_clients_active(1);
     gps_set_gps_lock(0);
     return 0;
 }

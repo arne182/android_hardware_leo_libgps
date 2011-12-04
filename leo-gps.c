@@ -839,7 +839,7 @@ static void* get_position_thread_method()
 	D("get_position_thread finished");
 	return NULL;
 }
-
+/*
 static void gps_state_done( GpsState*  s ) {
 
     get_pos = 0;
@@ -868,8 +868,9 @@ static void gps_state_done( GpsState*  s ) {
 #if ENABLE_NMEA
     sem_destroy(&s->fix_sem);
 #endif
-}
+}*/
 
+/*
 static void gps_state_start( GpsState*  s ) {
     // Navigation started.
     get_pos = 1;
@@ -884,8 +885,43 @@ static void gps_state_start( GpsState*  s ) {
     if (ret != 1)
         D("%s: could not send CMD_START command: ret=%d: %s",
         __FUNCTION__, ret, strerror(errno));
+}*/
+
+static void gps_state_done( GpsState*  s ) {
+	
+	get_pos = 0;
+	active = 0;
+	pthread_cond_signal(&get_pos_ready_cond);
+	pthread_cond_signal(&get_position_cond);
+	
+	s->init = STATE_QUIT;
+	sem_destroy(&s->fix_sem);
+	
+	update_gps_status(GPS_STATUS_ENGINE_OFF);
 }
 
+static void gps_state_start( GpsState*  s ) {
+	
+	get_pos = 1;
+	pthread_cond_signal(&get_position_cond);
+	
+	// Navigation started.
+	update_gps_status(GPS_STATUS_SESSION_BEGIN);
+}
+
+static void gps_state_stop( GpsState*  s ) {
+	
+	exit_gps_rpc();
+	
+	get_pos = 0;
+	
+	pthread_cond_signal(&get_pos_ready_cond);
+	
+	// Navigation ended.
+	update_gps_status(GPS_STATUS_SESSION_END);
+	
+}
+/*
 static void gps_state_stop( GpsState*  s ) {
     // Navigation ended.
     get_pos = 0;
@@ -900,7 +936,7 @@ static void gps_state_stop( GpsState*  s ) {
     if (ret != 1)
         D("%s: could not send CMD_STOP command: ret=%d: %s",
         __FUNCTION__, ret, strerror(errno));
-}
+}*/
 
 static int epoll_register( int  epoll_fd, int  fd ) {
     struct epoll_event  ev;

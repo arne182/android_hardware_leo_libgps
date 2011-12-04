@@ -1159,8 +1159,10 @@ void pdsm_pd_callback() {
 
 
 
-void pass_nmea(GpsState*  s, char *sentence, int length)
+void pass_nmea(char *sentence, int length)
 {
+	D("%s() running", __FUNCTION__);
+	GpsState*  s = _gps_state;
 	int nn;
 	
 	sem_wait(&s->fix_sem);

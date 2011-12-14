@@ -40,70 +40,14 @@
 
 #define  ENABLE_NMEA 1
 
-#define  DUMP_DATA  1
-#define  GPS_DEBUG  1
+#define  DUMP_DATA  0
+#define  GPS_DEBUG  0
 
 #if GPS_DEBUG
 #  define  D(...)   LOGD(__VA_ARGS__)
 #else
 #  define  D(...)   ((void)0)
 #endif
-
-typedef uint32_t pdsm_client_type_e;
-typedef int pdsm_client_id_type;
-
-typedef uint32_t pdsm_pa_e_type;
-
-typedef uint32_t pdsm_pa_nmea_port_e_type;
-typedef uint32_t pdsm_pa_nmea_reporting_e_type;
-
-typedef uint32_t pdsm_pd_session_e_type;
-typedef uint32_t pdsm_pd_session_operation_e_type;
-
-typedef uint32_t pdsm_server_option_e_type;
-typedef uint32_t pdsm_server_address_e_type;
-
-typedef uint32_t pdsm_sess_jgps_type_e_type;
-
-typedef uint32_t pdsm_pd_cmd_cb_f_type;
-typedef uint32_t pdsm_pa_cmd_cb_f_type;
-typedef uint32_t pdsm_xtra_cmd_cb_f_type;
-
-typedef uint32_t pdsm_xtra_dc_status_e_type;
-
-typedef uint32_t pdsm_pa_event_f_type;
-typedef uint32_t pdsm_client_event_reg_e_type;
-typedef uint32_t pdsm_pa_event_type;
-typedef uint32_t pdsm_pa_cmd_err_f_type;
-
-typedef uint32_t pdsm_pd_event_f_type;
-typedef uint32_t pdsm_pd_event_type;
-typedef uint32_t pdsm_pd_cmd_err_f_type;
-typedef uint32_t pdsm_pd_end_session_e_type;
-
-typedef uint32_t pdsm_xtra_event_f_type;
-typedef uint32_t pdsm_xtra_event_type;
-typedef uint32_t pdsm_xtra_cmd_err_f_type;
-
-typedef uint32_t pdsm_ext_status_event_f_type;
-typedef uint32_t pdsm_ext_status_event_type;
-typedef uint32_t pdsm_ext_status_cmd_err_f_type;
-
-typedef uint32_t pdsm_gps_lock_e_type;
-typedef uint32_t pdsm_position_mode_type;
-typedef uint32_t pdsm_pa_mt_lr_support_e_type;
-typedef uint32_t pdsm_pa_mo_method_e_type;
-typedef uint8_t pdsm_pa_nmea_type;
-typedef uint32_t pdsm_pa_sbas_status_e_type;
-
-typedef uint32_t pdsm_atl_type;
-typedef uint32_t pdsm_atl_open_f_type;
-typedef uint32_t pdsm_atl_close_f_type;
-typedef uint32_t pdsm_atl_dns_lookup_f_type;
-
-typedef uint32_t pdsm_lcs_event_f_type;
-typedef uint32_t pdsm_lcs_event_type;
-typedef uint32_t pdsm_lcs_cmd_err_f_type;
 
 typedef struct registered_server_struct {
     /* MUST BE AT OFFSET ZERO!  The client code assumes this when it overwrites
@@ -152,55 +96,16 @@ static struct timeval timeout;
 static SVCXPRT *_svc;
 
 static uint8_t CHECKED[4] = {0};
-static uint8_t XTRA_AUTO_DOWNLOAD_ENABLED = 1;
-static uint8_t XTRA_DOWNLOAD_INTERVAL = 2;  // hours
-static uint8_t CLEANUP_ENABLED = 0;
-static uint8_t SESSION_TIMEOUT = 200;  // seconds
-static uint8_t MEASUREMENT_PRECISION = 15;  // meters
+static uint8_t XTRA_AUTO_DOWNLOAD_ENABLED = 0;
+static uint8_t XTRA_DOWNLOAD_INTERVAL = 24;  // hours
+static uint8_t CLEANUP_ENABLED = 1;
+static uint8_t SESSION_TIMEOUT = 2;  // seconds
+static uint8_t MEASUREMENT_PRECISION = 10;  // meters
 
 struct params {
     uint32_t *data;
     int length;
 };
-
-typedef struct pdsm_pd_sec_update_rate_s_type_struct
-{
-	uint8_t val0;
-} pdsm_pd_sec_update_rate_s_type;
-
-typedef struct pdsm_pa_nmea_config_s_type_struct
-{
-	pdsm_pa_nmea_port_e_type pdsm_pa_nmea_port_e_type;
-	pdsm_pa_nmea_reporting_e_type pdsm_pa_nmea_reporting_e_type;
-} pdsm_pa_nmea_config_s_type;
-
-typedef struct pdsm_delete_parms_type_struct
-{
-    uint32_t val0;
-	uint32_t val1;
-	uint32_t val2;
-	uint32_t val3;
-	uint32_t val4;
-	uint32_t val5;
-	uint32_t val6;
-	uint32_t val7;
-} pdsm_delete_parms_type;
-
-typedef struct pdsm_pa_info_type_struct
-{
-    pdsm_pa_e_type pa_set;
-	void *pa_ptr;
-} pdsm_pa_info_type;
-
-typedef struct pdsm_set_parameters_args_struct
-{
-    pdsm_pa_cmd_cb_f_type pdsm_pa_cmd_cb_f_type;
-	uint32_t pdsm_set_parameters_args_client_data_ptr;
-	pdsm_pa_e_type pdsm_pa_e_type;
-	pdsm_pa_info_type *pdsm_pa_info_type;
-	pdsm_client_id_type pdsm_client_id_type;
-} pdsm_set_parameters_args;
-
 
 typedef struct pdsm_xtra_time_info {
     uint32_t uncertainty;
@@ -208,42 +113,6 @@ typedef struct pdsm_xtra_time_info {
     bool_t ref_to_utc_time;
     bool_t force_flag;
 } pdsm_xtra_time_info_type;
-
-typedef struct pdsm_server_ipv4_address_type_struct
-{
-	uint32_t val0;
-	uint32_t val1;
-} pdsm_server_ipv4_address_type;
-
-typedef struct pdsm_server_ipv6_address_type_struct
-{
-	uint32_t val1;
-	//missing array needs work
-} pdsm_server_ipv6_address_type;
-
-typedef struct pdsm_server_url_address_type_struct
-{
-	uint8_t val0;
-	char *byte_array;
-} pdsm_server_url_address_type;
-
-typedef struct pdsm_server_address_u_type_struct
-{
-	pdsm_server_address_e_type pdsm_server_address_e_type;
-	void *address_struct;
-} pdsm_server_address_u_type;
-
-typedef struct pdsm_server_address_s_type_struct
-{
-	pdsm_server_address_e_type pdsm_server_address_e_type;
-	pdsm_server_address_u_type *pdsm_server_address_u_type;
-} pdsm_server_address_s_type;
-
-typedef struct pdsm_pd_server_info_s_type_struct
-{
-	pdsm_server_option_e_type pdsm_server_option_e_type;
-	pdsm_server_address_s_type *pdsm_server_address_s_type;
-} pdsm_pd_server_info_s_type;
 
 struct xtra_time_params {
     uint32_t *data;
@@ -268,275 +137,6 @@ struct xtra_auto_params {
     uint8_t boolean;
     uint16_t interval;
 };
-
-static bool_t xdr_rpc_pdsm_pa_nmea_type(XDR *xdrs, pdsm_pa_nmea_type *pdsm_pa_nmea_type)
-{
-	if (!xdr_u_char(xdrs, pdsm_pa_nmea_type))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_pa_mo_method_e_type(XDR *xdrs, pdsm_pa_mo_method_e_type *pdsm_pa_mo_method_e_type)
-{
-	if (!xdr_u_long(xdrs, pdsm_pa_mo_method_e_type))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_server_url_address_type(XDR *xdrs, pdsm_server_url_address_type *pdsm_server_url_address_type)
-{
-	if(!xdr_u_char(xdrs, &pdsm_server_url_address_type->val0))
-		return 0;
-	if(!xdr_opaque(xdrs, pdsm_server_url_address_type->byte_array, pdsm_server_url_address_type->val0)) //Not sure if val0 is the size
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_server_ipv4_address_type(XDR *xdrs, pdsm_server_ipv4_address_type *pdsm_server_ipv4_address_type)
-{
-	if (!xdr_u_long(xdrs, &pdsm_server_ipv4_address_type->val0))
-		return 0;
-	if (!xdr_u_long(xdrs, &pdsm_server_ipv4_address_type->val1))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_pd_server_address_u_type(XDR *xdrs, pdsm_server_address_u_type *pdsm_server_address_u_type)
-{
-	if(!xdr_u_long(xdrs, &pdsm_server_address_u_type->pdsm_server_address_e_type))
-		return 0;
-	if(pdsm_server_address_u_type->pdsm_server_address_e_type == 0)
-	{
-		if(!xdr_rpc_pdsm_server_ipv4_address_type(xdrs, pdsm_server_address_u_type->address_struct))
-			return 0;   
-	}
-	else if (pdsm_server_address_u_type->pdsm_server_address_e_type == 1)
-	{
-		if(!xdr_rpc_pdsm_server_url_address_type(xdrs, pdsm_server_address_u_type->address_struct))
-			return 0;
-	}
-	else if(pdsm_server_address_u_type->pdsm_server_address_e_type == 2)
-	{
-		//ipv6
-	}
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_pd_server_address_s_type(XDR *xdrs, pdsm_server_address_s_type *pdsm_server_address_s_type)
-{
-	if(!xdr_u_long(xdrs, &pdsm_server_address_s_type->pdsm_server_address_e_type))
-		return 0;
-	if(!xdr_rpc_pdsm_pd_server_address_u_type(xdrs, pdsm_server_address_s_type->pdsm_server_address_u_type))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_pd_server_info_s_type(XDR *xdrs, pdsm_pd_server_info_s_type *pdsm_pd_server_info_s_type)
-{
-	if(!xdr_u_long(xdrs, &pdsm_pd_server_info_s_type->pdsm_server_option_e_type))
-		return 0;
-	if(!xdr_rpc_pdsm_pd_server_address_s_type(xdrs, pdsm_pd_server_info_s_type->pdsm_server_address_s_type))
-		return 0;
-	
-	return 1;
-}
-
-
-static bool_t xdr_rpc_pdsm_pa_mt_lr_support_e_type(XDR *xdrs, pdsm_pa_mt_lr_support_e_type *pdsm_pa_mt_lr_support_e_type)
-{
-	if (!xdr_u_long(xdrs, pdsm_pa_mt_lr_support_e_type))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_position_mode_type(XDR *xdrs, pdsm_position_mode_type *pdsm_position_mode_type)
-{
-	if (!xdr_u_long(xdrs, pdsm_position_mode_type))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_pa_sbas_status_e_type(XDR *xdrs, pdsm_pa_sbas_status_e_type *pdsm_pa_sbas_status_e_type)
-{
-	if (!xdr_u_long(xdrs, pdsm_pa_sbas_status_e_type))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_gps_lock_e_type(XDR *xdrs, pdsm_gps_lock_e_type *pdsm_gps_lock_e_type)
-{
-	if (!xdr_u_long(xdrs, pdsm_gps_lock_e_type))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_pd_sec_update_rate_s_type(XDR *xdrs, pdsm_pd_sec_update_rate_s_type *pdsm_pd_sec_update_rate_s_type)
-{
-	if (!xdr_u_char(xdrs, pdsm_pd_sec_update_rate_s_type->val0))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_pa_nmea_config_s_type(XDR *xdrs, pdsm_pa_nmea_config_s_type *pdsm_pa_nmea_config_s_type)
-{
-	if (!xdr_u_long(xdrs, &pdsm_pa_nmea_config_s_type->pdsm_pa_nmea_port_e_type))
-		return 0;
-	if (!xdr_u_long(xdrs, &pdsm_pa_nmea_config_s_type->pdsm_pa_nmea_reporting_e_type))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_delete_params_type(XDR *xdrs, pdsm_delete_parms_type *pdsm_delete_parms_type)
-{
-	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val0))
-		return 0;
-	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val1))
-		return 0;
-	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val2))
-		return 0;
-	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val3))
-		return 0;
-	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val4))
-		return 0;
-	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val5))
-		return 0;
-	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val6))
-		return 0;
-	if (!xdr_u_long(xdrs, &pdsm_delete_parms_type->val7))
-		return 0;
-	
-	return 1;
-}
-
-static bool_t xdr_rpc_pdsm_pa_info(XDR *xdrs, pdsm_pa_info_type *pdsm_pa_info_type)
-{
-	if (!xdr_u_long(xdrs, &pdsm_pa_info_type->pa_set))
-		return 0;
-	switch(pdsm_pa_info_type->pa_set)
-	{
-		case 1:
-			//xdr_rpc_pdsm_pm_jgpsone_app_s_type needs implementing
-			return 0;
-			break;
-		case 2:
-			if(!xdr_rpc_pdsm_gps_lock_e_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 3:
-			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 4:
-			if(!xdr_rpc_pdsm_delete_params_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 5:
-			if(!xdr_rpc_pdsm_position_mode_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 6:
-			if(!xdr_rpc_pdsm_pa_mt_lr_support_e_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 7:
-			if(!xdr_rpc_pdsm_pa_mo_method_e_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 8:
-			if(!xdr_rpc_pdsm_pa_nmea_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 9:
-			if(!xdr_rpc_pdsm_pd_server_address_s_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 10:
-			if(!xdr_rpc_pdsm_pd_server_address_s_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 11:
-			if(!xdr_rpc_pdsm_pd_server_address_s_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 12:
-			//xdr_rpc_pdsm_pd_ssd_s_type needs implementing
-			return 0;
-			break;
-		case 13:
-			if(!xdr_rpc_pdsm_pd_sec_update_rate_s_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 14:
-			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 15:
-			if(!xdr_rpc_pdsm_pa_nmea_config_s_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 16:
-			//xdr_rpc_pdsm_efs_data_s_type needs implementing
-			return 0;
-			break;
-		case 17:
-			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 18:
-			if(!xdr_rpc_pdsm_pa_sbas_status_e_type(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 19:
-			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 20:
-			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 21:
-			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		case 22:
-			if(!xdr_u_char(xdrs, pdsm_pa_info_type->pa_ptr))
-				return 0;
-			break;
-		default:
-			return 0;
-	}
-	
-	return 1;
-}
-
-
-
-static bool_t xdr_rpc_pdsm_set_parameters_args(XDR *xdrs, pdsm_set_parameters_args *pdsm_set_parameters_args) 
-{    
-	if (!xdr_u_long(xdrs, &pdsm_set_parameters_args->pdsm_pa_cmd_cb_f_type))
-		return 0;
-	if (!xdr_u_long(xdrs, &pdsm_set_parameters_args->pdsm_set_parameters_args_client_data_ptr))
-		return 0;
-	if (!xdr_u_long(xdrs, &pdsm_set_parameters_args->pdsm_pa_e_type))
-		return 0;
-	if (!xdr_pointer(xdrs, &pdsm_set_parameters_args->pdsm_pa_info_type, sizeof(pdsm_pa_info_type), xdr_rpc_pdsm_pa_info))
-		return 0;
-	if (!xdr_int(xdrs, &pdsm_set_parameters_args->pdsm_client_id_type))
-		return 0;
-	
-	return 1;
-}
 
 static bool_t xdr_args(XDR *clnt, struct params *par) {
     int i;
@@ -1052,8 +652,7 @@ void dispatch_pdsm_pd(uint32_t *data) {
     }
     if(event&PDSM_PD_EVENT_GPS_DONE) {
         D("PDSM_PD_EVENT_GPS_DONE");
-        pdsm_pd_event_gps_done_callback();
-        //no_fix = 1;
+        no_fix = 1;
     }
     GpsLocation fix;
     fix.flags = 0;
@@ -1147,19 +746,10 @@ void dispatch_pdsm_pd(uint32_t *data) {
     if(event&PDSM_PD_EVENT_DONE)
     {
         D("PDSM_PD_EVENT_DONE");
-        pdsm_pd_event_done_callback();
+        pdsm_pd_callback();
     }
 }
 
-void dispatch_pdsm_pd_cmd(uint32_t *data) 
-{
-	uint32_t pd_cmd=ntohl(data[2]);
-	uint32_t pd_error=ntohl(data[3]);
-	
-	D("pd_cmd: %d", pd_cmd);
-	D("pd_error: %d", pd_error);
-}
-/*
 void dispatch_pdsm_ext(uint32_t *data) {
     GpsSvStatus ret;
     int i;
@@ -1190,58 +780,9 @@ void dispatch_pdsm_ext(uint32_t *data) {
     //ret.used_in_fix_mask=ntohl(data[9]);
     ret.used_in_fix_mask=0;
     update_gps_svstatus(&ret);
-}*/
-
-void dispatch_pdsm_ext(char *data) 
-{	
-	int length;
-	char *sentence;
-	
-	length = strlen(data+0x24);
-	sentence = malloc(length);
-	strncpy(sentence, data+0x24, length);
-	
-	if(strncmp(sentence, "$GP", 3) == 0)
-	{
-		pass_nmea(sentence, length);
-	}
-	
-	free(sentence);
 }
 
-void dispatch_pdsm_pa_cmd(uint32_t *data)
-{	
-	uint32_t pa_cmd=ntohl(data[2]);
-	uint32_t pa_error=ntohl(data[3]);
-	
-	D("pa_cmd: %d", pa_cmd);
-	D("pa_error: %d", pa_error);
-}
-
-void dispatch_pdsm_pa(uint32_t *data)
-{
-	uint32_t pa_client=ntohl(data[0]);
-	uint32_t pa_param=ntohl(data[1]);
-	
-	D("Client: %d", pa_client);
-	D("Parameter: %d", pa_param);
-	
-	if(pa_param == 4)
-	{
-		delete_params_complete();
-	}
-}
-
-void dispatch_pdsm_xtra_cmd(uint32_t * data)
-{
-	uint32_t xtra_cmd=ntohl(data[2]);
-	uint32_t xtra_error=ntohl(data[3]);
-	
-	D("xtra_cmd: %d", xtra_cmd);
-	D("xtra_error: %d", xtra_error);
-}
-
-void dispatch_pdsm_xtra(uint8_t *data) {
+void dispatch_pdsm_xtra_req(uint8_t *data) {
     //Handles download requests from gps chip
     //Have to check if it is a download request because the same procid is multipurpose
     
@@ -1258,7 +799,7 @@ void dispatch_pdsm_xtra(uint8_t *data) {
         xtra_download_request();
     }
 }
-/*
+
 void dispatch_pdsm(uint32_t *data) {
     uint32_t procid=ntohl(data[5]);
     D("%s() is called. data[5]=procid=%d", __FUNCTION__, procid);
@@ -1268,26 +809,6 @@ void dispatch_pdsm(uint32_t *data) {
         dispatch_pdsm_ext(&(data[10]));
     else if(procid==5)
         dispatch_pdsm_xtra_req(&(data[10]));
-}*/
-
-void dispatch_pdsm(uint32_t *data) {
-	uint32_t procid=ntohl(data[5]);
-	D("%s() is called. data[5]=procid=%d", __FUNCTION__, procid);
-	if(procid==1) 
-		dispatch_pdsm_pd(&(data[10]));
-	else if(procid==2)
-		dispatch_pdsm_pa(&(data[14]));
-	else if(procid==4) 
-		dispatch_pdsm_ext(&(data[10]));
-	else if(procid==5)
-		dispatch_pdsm_xtra(&(data[10]));
-	else if(procid==11)
-		dispatch_pdsm_pd_cmd(&(data[10]));
-	else if(procid==12)
-		dispatch_pdsm_pa_cmd(&(data[10]));
-	else if(procid==15)
-		dispatch_pdsm_xtra_cmd(&(data[10]));
-		
 }
 
 void dispatch_atl(uint32_t *data) {
@@ -1384,7 +905,7 @@ int parse_gps_conf() {
             if (result != NULL) {
                 result = result+strlen(check_timeout)+1;
                 i = atoi(result);
-                if (i>1 && i<302)
+                if (i>1 && i<121)
                     SESSION_TIMEOUT = i;
                 CHECKED[3] = 1;
             }
@@ -1461,8 +982,7 @@ int init_leo()
             gps_xtra_set_auto_params();
         CHECKED[0] = 1;
     }
-    set_clients_active(1);
-    gps_set_gps_lock(0);
+
     return 0;
 }
 
@@ -1510,17 +1030,6 @@ int gps_xtra_inject_time_info(GpsUtcTime time, int64_t timeReference, int uncert
     time_info_ptr.force_flag = 1;
     res = pdsm_xtra_inject_time_info(_clnt, 0, client_IDs[0xb], 0, &time_info_ptr);
     return res;
-}
-
-int gps_set_gps_lock(pdsm_gps_lock_e_type pdsm_gps_lock_e_type)
-{
-	uint32_t res = -1;
-	pdsm_pa_info_type pdsm_pa_info_type;
-	pdsm_pa_info_type.pa_set = 2;
-	pdsm_pa_info_type.pa_ptr = &pdsm_gps_lock_e_type;
-	
-	res = pdsm_set_parameters(_clnt,0x1,0, 0, 1, &pdsm_pa_info_type);
-	return res;
 }
 
 void gps_get_position() 
@@ -1572,60 +1081,4 @@ void cleanup_gps_rpc_clients()
     clnt_destroy(_clnt);
 }
 
-int gps_delete_data(uint32_t flags) {
-    uint32_t res = -1;
-	uint32_t flag_conv = 0;
-	
-	pdsm_pa_info_type pdsm_pa_info_type;
-	pdsm_delete_parms_type pdsm_delete_parms_type;
-	
-	if (flags == 34813) 
-	{
-		flag_conv = 1021;
-	}
-	else if (flags == 65535)
-	{
-		flag_conv = 34815;
-	}
-	else {
-		flag_conv = flags;
-	}
-	
-	pdsm_delete_parms_type.val0 = flag_conv;
-	pdsm_delete_parms_type.val1 = 0;
-	pdsm_delete_parms_type.val2 = 0;
-	pdsm_delete_parms_type.val3 = 0;
-	pdsm_delete_parms_type.val4 = 0;
-	pdsm_delete_parms_type.val5 = 0;
-	pdsm_delete_parms_type.val6 = 0;
-	pdsm_delete_parms_type.val7 = 0;
-	
-	pdsm_pa_info_type.pa_set = 4;
-	pdsm_pa_info_type.pa_ptr = &pdsm_delete_parms_type;
-	
-	res = pdsm_set_parameters(_clnt,0x1,0, 0, 0, &pdsm_pa_info_type);
-	
-	return res;
-}
-
-int pdsm_set_parameters(struct CLIENT *clnt, int client, uint32_t val0, uint32_t val1, uint32_t val2, pdsm_pa_info_type *pdsm_pa_info_type) 
-{
-        uint32_t res = -1;
-	pdsm_set_parameters_args pdsm_set_parameters_args;
-	pdsm_set_parameters_args.pdsm_pa_cmd_cb_f_type = val0;
-	pdsm_set_parameters_args.pdsm_set_parameters_args_client_data_ptr = val1;
-	pdsm_set_parameters_args.pdsm_pa_info_type = pdsm_pa_info_type;
-	pdsm_set_parameters_args.pdsm_pa_e_type = val2;
-	pdsm_set_parameters_args.pdsm_client_id_type = client_IDs[client];
-	if(clnt_call(clnt, 0xF, 
-	    (xdrproc_t)xdr_rpc_pdsm_set_parameters_args, 
-	    (caddr_t)&pdsm_set_parameters_args, 
-	    (xdrproc_t)xdr_result_int, 
-	    (caddr_t)&res, timeout)) {
-		D("pdsm_set_parameters(%u, %u, %u, %d) failed\n", val0, val1, val2, client);
-		exit(-1);
-	}
-	D("pdsm_set_parameters(%u, %u, %u, %d)=%d\n", val0, val1, val2, client, res);
-	return res;
-}
 // END OF FILE

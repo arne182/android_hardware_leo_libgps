@@ -982,7 +982,9 @@ static void* gps_timer_thread( void*  arg ) {
     usleep((uint64_t)500000);
     memset( r->sv_status.sv_list, 0, sizeof(r->sv_status.sv_list) );
     int fix_temp = state->fix_freq;
+    D("fix_temp = %d",fix_temp);
     state->fix_freq = 1;
+    D("state->fix_freq = 1");
     do {
         GPS_STATE_LOCK_FIX(state);
 
@@ -1011,18 +1013,23 @@ static void* gps_timer_thread( void*  arg ) {
             clock_t now = clock();
             int elapsed = 1;
             int fix_freqflag=1;
+            D("fix_freqflag = 1");
             do{
                 usleep((uint64_t)500000);
                 elapsed = (clock()-now)/CLOCKS_PER_SEC;
-		if(fix_temp > 5 && elapsed<10)
+		if(fix_temp > 3 && elapsed<5)
                 {
                     state->fix_freq = 1;
+                    D("Fix_freq = 1");
                     fix_freqflag = 0;
+                    D("fix_freqflag = 0");
                 }
 		else
                 {
                     state->fix_freq = fix_temp;
+                    D("state->fix_freq = %d",fix_temp);
                     fix_freqflag = 1;
+                    D("fix_freqflag = 1");
                 }
                 
             }while(elapsed<state->fix_freq && fix_freqflag);
@@ -1030,7 +1037,7 @@ static void* gps_timer_thread( void*  arg ) {
         else
             usleep((uint64_t)500000);
         fix_temp = state->fix_freq;
-    
+        D("fix_temp = %d",state->fix_freq);
     } while(state->init == STATE_START);
 
     D("%s() destroyed", __FUNCTION__);
@@ -1345,6 +1352,7 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
     }
     // fix_frequency is only used by NMEA version
     s->fix_freq = fix_frequency;
+    D("s->fix_freq = %d", fix_frequency);
     return 0;
 }
 

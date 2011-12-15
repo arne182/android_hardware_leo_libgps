@@ -1019,7 +1019,7 @@ static void* gps_timer_thread( void*  arg ) {
                 if(elapsed<0)
                 {
                     now = clock();
-                    elapse = 6;
+                    elapsed = 6;
                 }
                 D("elapsed = %f",elapsed);
 		if(fix_temp > 3 && elapsed<5)

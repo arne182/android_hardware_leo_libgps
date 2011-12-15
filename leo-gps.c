@@ -1019,19 +1019,21 @@ static void* gps_timer_thread( void*  arg ) {
                 if(elapsed<0)
                 {
                     now = clock();
-                    elapsed = 6;
+                    elapsed = 11;
                 }
                 D("elapsed = %f",elapsed);
-		if(fix_temp > 3 && elapsed<5)
+		if(fix_temp > 3 && elapsed<10)
                 {
-                    state->fix_freq = 1;
+                    if(state->fix_freq != 1)
+                        state->fix_freq = 1;
                     D("Fix_freq = 1");
                     fix_freqflag = 1;
                     D("fix_freqflag = 1");
                 }
 		else
                 {
-                    state->fix_freq = fix_temp;
+                    if(state->fix_freq != fix_temp)
+                       state->fix_freq = fix_temp;
                     D("state->fix_freq = %d",fix_temp);
                     fix_freqflag = 0;
                     D("fix_freqflag = 0");

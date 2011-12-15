@@ -75,6 +75,8 @@ static pthread_cond_t get_pos_ready_cond = PTHREAD_COND_INITIALIZER;
 
 static int started = 0;
 static int active = 0;
+static int fix_temp = 1;
+D("fix_temp = %d",fix_temp);
 
 void update_gps_location(GpsLocation *location);
 void update_gps_status(GpsStatusValue value);
@@ -981,8 +983,6 @@ static void* gps_timer_thread( void*  arg ) {
     r->sv_status.num_svs = 0;
     usleep((uint64_t)500000);
     memset( r->sv_status.sv_list, 0, sizeof(r->sv_status.sv_list) );
-    int fix_temp = state->fix_freq;
-    D("fix_temp = %d",fix_temp);
     state->fix_freq = 1;
     D("state->fix_freq = 1");
     do {
@@ -1036,8 +1036,6 @@ static void* gps_timer_thread( void*  arg ) {
         }
         else
             usleep((uint64_t)500000);
-        fix_temp = state->fix_freq;
-        D("fix_temp = %d",state->fix_freq);
     } while(state->init == STATE_START);
 
     D("%s() destroyed", __FUNCTION__);
@@ -1352,6 +1350,8 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
     }
     // fix_frequency is only used by NMEA version
     s->fix_freq = fix_frequency;
+    fix_temp = state->fix_freq;
+    D("fix_temp = %d",state->fix_freq);
     D("s->fix_freq = %d", fix_frequency);
     return 0;
 }

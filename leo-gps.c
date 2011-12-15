@@ -1350,8 +1350,8 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
     }
     // fix_frequency is only used by NMEA version
     s->fix_freq = fix_frequency;
-    fix_temp = state->fix_freq;
-    D("fix_temp = %d",state->fix_freq);
+    fix_temp = s->fix_freq;
+    D("fix_temp = %d",fix_temp);
     D("s->fix_freq = %d", fix_frequency);
     return 0;
 }

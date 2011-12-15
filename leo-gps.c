@@ -1011,7 +1011,7 @@ static void* gps_timer_thread( void*  arg ) {
         if (r->fix_flags_cached) {
             clock_t now = clock();
             double elapsed = 1;
-            int fix_freqflag=1;
+            int fix_freqflag=0;
             D("fix_freqflag = 1");
             do{
                 usleep((uint64_t)500000);
@@ -1021,14 +1021,14 @@ static void* gps_timer_thread( void*  arg ) {
                 {
                     state->fix_freq = 1;
                     D("Fix_freq = 1");
-                    fix_freqflag = 0;
+                    fix_freqflag = 1;
                     D("fix_freqflag = 0");
                 }
 		else
                 {
                     state->fix_freq = fix_temp;
                     D("state->fix_freq = %d",fix_temp);
-                    fix_freqflag = 1;
+                    fix_freqflag = 0;
                     D("fix_freqflag = 1");
                 }
                 

@@ -1032,7 +1032,7 @@ static void* gps_timer_thread( void*  arg ) {
                     D("fix_freqflag = 0");
                 }
                 
-            }while(elapsed<state->fix_freq && fix_freqflag==0);
+            }while(elapsed<state->fix_freq && fix_freqflag==1);
         }
         else
             usleep((uint64_t)500000);

@@ -76,7 +76,6 @@ static pthread_cond_t get_pos_ready_cond = PTHREAD_COND_INITIALIZER;
 static int started = 0;
 static int active = 0;
 static int fix_temp = 1;
-D("fix_temp = %d",fix_temp);
 
 void update_gps_location(GpsLocation *location);
 void update_gps_status(GpsStatusValue value);

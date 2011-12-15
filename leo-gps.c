@@ -1015,7 +1015,7 @@ static void* gps_timer_thread( void*  arg ) {
             D("fix_freqflag = 1");
             do{
                 usleep((uint64_t)500000);
-                elapsed = difftime(clock(),now);///CLOCKS_PER_SEC;
+                elapsed = difftime(clock(),now)/1000000;///CLOCKS_PER_SEC;
                 D("elapsed = %f",elapsed);
 		if(fix_temp > 3 && elapsed<5)
                 {

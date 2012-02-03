@@ -982,8 +982,8 @@ static void* gps_timer_thread( void*  arg ) {
     r->sv_status.num_svs = 0;
     usleep((uint64_t)500000);
     memset( r->sv_status.sv_list, 0, sizeof(r->sv_status.sv_list) );
-    state->fix_freq = 1;
-    D("state->fix_freq = 1");
+    //state->fix_freq = 1;
+    //D("state->fix_freq = 1");
     do {
         GPS_STATE_LOCK_FIX(state);
 
@@ -1021,11 +1021,11 @@ static void* gps_timer_thread( void*  arg ) {
                     now = clock();
                     elapsed = 11;
                 }
-                D("elapsed = %f",elapsed);
+                //D("elapsed = %f",elapsed);
 		if(fix_temp > 3 && elapsed<10)
                 {
                     if(state->fix_freq != 1)
-                        state->fix_freq = 1;
+                        //state->fix_freq = 1;
                     //D("Fix_freq = 1");
                     fix_freqflag = 1;
                     //D("fix_freqflag = 1");
@@ -1033,7 +1033,7 @@ static void* gps_timer_thread( void*  arg ) {
 		else
                 {
                     if(state->fix_freq != fix_temp)
-                       state->fix_freq = fix_temp;
+                       //state->fix_freq = fix_temp;
                     //D("state->fix_freq = %d",fix_temp);
                     fix_freqflag = 0;
                     //D("fix_freqflag = 0");
@@ -1352,8 +1352,8 @@ static int gps_set_position_mode(GpsPositionMode mode, int fix_frequency) {
         //We don't handle single shot requests atm...
         //So one every 1 seconds will it be.
         fix_frequency = 1;
-    } else if (fix_frequency > 1800) { //30mins
-        fix_frequency = 1800;
+    } else if (fix_frequency > 8) { //9 seconds times out
+        fix_frequency = 8;
     }
     // fix_frequency is only used by NMEA version
     s->fix_freq = fix_frequency;

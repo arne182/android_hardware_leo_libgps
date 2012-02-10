@@ -982,8 +982,8 @@ static void* gps_timer_thread( void*  arg ) {
     r->sv_status.num_svs = 0;
     usleep((uint64_t)500000);
     memset( r->sv_status.sv_list, 0, sizeof(r->sv_status.sv_list) );
-    //state->fix_freq = 1;
-    //D("state->fix_freq = 1");
+    state->fix_freq = 1;
+    D("state->fix_freq = 1");
     do {
         GPS_STATE_LOCK_FIX(state);
 
@@ -1012,7 +1012,7 @@ static void* gps_timer_thread( void*  arg ) {
             clock_t now = clock();
             double elapsed = 1;
             int fix_freqflag=0;
-            //D("fix_freqflag = 0");
+            D("fix_freqflag = 0");
             do{
                 usleep((uint64_t)500000);
                 elapsed = difftime(clock(),now)/1000000;///CLOCKS_PER_SEC;
@@ -1021,22 +1021,22 @@ static void* gps_timer_thread( void*  arg ) {
                     now = clock();
                     elapsed = 11;
                 }
-                //D("elapsed = %f",elapsed);
+                D("elapsed = %f",elapsed);
 		if(fix_temp > 3 && elapsed<10)
                 {
                     if(state->fix_freq != 1)
-                        //state->fix_freq = 1;
-                    //D("Fix_freq = 1");
+                        state->fix_freq = 1;
+                    D("Fix_freq = 1");
                     fix_freqflag = 1;
-                    //D("fix_freqflag = 1");
+                    D("fix_freqflag = 1");
                 }
 		else
                 {
                     if(state->fix_freq != fix_temp)
-                       //state->fix_freq = fix_temp;
-                    //D("state->fix_freq = %d",fix_temp);
+                       state->fix_freq = fix_temp;
+                    D("state->fix_freq = %d",fix_temp);
                     fix_freqflag = 0;
-                    //D("fix_freqflag = 0");
+                    D("fix_freqflag = 0");
                 }
                 
             }while(elapsed<state->fix_freq || fix_freqflag==1);

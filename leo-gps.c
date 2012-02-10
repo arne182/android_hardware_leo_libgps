@@ -1022,7 +1022,7 @@ static void* gps_timer_thread( void*  arg ) {
                     elapsed = 11;
                 }
                 D("elapsed = %f",elapsed);
-		if(fix_temp > 3 && elapsed<10)
+		if(fix_temp > 3 && elapsed<2)
                 {
                     if(state->fix_freq != 1)
                         state->fix_freq = 1;

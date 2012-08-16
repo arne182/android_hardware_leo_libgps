@@ -6,6 +6,7 @@
  * Copyright (C) 2009-2010 The XDAndroid Project
  * Copyright (C) 2010      dan1j3l @ xda-developers
  * Copyright (C) 2011      tytung  @ xda-developers
+ * Copyright (C) 2012      arne182  @ xda-developers
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,8 +41,8 @@
 
 #define  ENABLE_NMEA 1
 
-#define  DUMP_DATA  0
-#define  GPS_DEBUG  0
+#define  DUMP_DATA  1
+#define  GPS_DEBUG  1
 
 #if GPS_DEBUG
 #  define  D(...)   LOGD(__VA_ARGS__)

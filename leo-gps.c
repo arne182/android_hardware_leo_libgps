@@ -39,7 +39,7 @@
 #define  LOG_TAG  "gps_leo"
 
 #define  XTRA_BLOCK_SIZE  400
-#define  ENABLE_NMEA 1
+#define  ENABLE_NMEA 0
 
 #define  DUMP_DATA  1
 #define  GPS_DEBUG  1
